@@ -1,4 +1,5 @@
 @file:Suppress("UNUSED_PARAMETER")
+
 package lesson1.task1
 
 import kotlin.math.*
@@ -58,7 +59,7 @@ fun main(args: Array<String>) {
  * Пользователь задает время в часах, минутах и секундах, например, 8:20:35.
  * Рассчитать время в секундах, прошедшее с начала суток (30035 в данном случае).
  */
-fun seconds(hours: Int, minutes: Int, seconds: Int): Int = hours * 3600 + munutes * 60 + seconds
+fun seconds(hours: Int, minutes: Int, seconds: Int): Int = (hours * 60 * 60) + (minutes * 60) + seconds
 
 /**
  * Тривиальная
@@ -67,7 +68,7 @@ fun seconds(hours: Int, minutes: Int, seconds: Int): Int = hours * 3600 + munute
  * Определить длину того же отрезка в метрах (в данном случае 18.98).
  * 1 сажень = 3 аршина = 48 вершков, 1 вершок = 4.445 см.
  */
-fun lengthInMeters(sagenes: Int, arshins: Int, vershoks: Int): Double = sagenes * 213.36 + arshins * 71.12 + vershoks * 4.445
+fun lengthInMeters(sagenes: Int, arshins: Int, vershoks: Int): Double = sagenes * 213.36 / 100 + arshins * 71.12 / 100 + vershoks * 4.445 / 100
 
 /**
  * Тривиальная
@@ -75,14 +76,15 @@ fun lengthInMeters(sagenes: Int, arshins: Int, vershoks: Int): Double = sagenes 
  * Пользователь задает угол в градусах, минутах и секундах (например, 36 градусов 14 минут 35 секунд).
  * Вывести значение того же угла в радианах (например, 0.63256).
  */
-fun angleInRadian(grad: Int, min: Int, sec: Int): Double = (grad + min / 60 + sec / 3600) / (180 / PI)
+fun angleInRadian(grad: Int, min: Int, sec: Int): Double = (grad + min / 60.0 + sec / (60.0 * 60)) / (180.0 / PI)
+
 /**
  * Тривиальная
  *
  * Найти длину отрезка, соединяющего точки на плоскости с координатами (x1, y1) и (x2, y2).
  * Например, расстояние между (3, 0) и (0, 4) равно 5
  */
-fun trackLength(x1: Double, y1: Double, x2: Double, y2: Double): Double = sqrt(sqr(abs(x1-x2)) + sqr(abs(y1-y2)))
+fun trackLength(x1: Double, y1: Double, x2: Double, y2: Double): Double = sqrt(sqr(abs(x1 - x2)) + sqr(abs(y1 - y2)))
 
 /**
  * Простая
@@ -91,8 +93,9 @@ fun trackLength(x1: Double, y1: Double, x2: Double, y2: Double): Double = sqrt(s
  * Определить третью цифру справа в этом числе (в данном случае 8).
  */
 fun thirdDigit(number: Int): Int {
-        while (number > 999) number = number - 1000
-        return number / 100
+    val answer: Int
+    if (number > 999) answer = number - ((number / 1000) * 1000) else answer = number
+    return answer / 100
 }
 
 /**
@@ -102,21 +105,7 @@ fun thirdDigit(number: Int): Int {
  * прибыл на станцию назначения в h2 часов m2 минут того же дня (например в 13:01).
  * Определите время поезда в пути в минутах (в данном случае 216).
  */
-fun travelMinutes(hoursDepart: Int, minutesDepart: Int, hoursArrive: Int, minutesArrive: Int): Int {
-        if (hoursArrive < hoursDepart) {
-                val hours = hoursArrive + 24 - hoursDepart
-        } 
-        else {
-                val hours = hoursArrive - hoursDepart
-        }
-        if (minutesArrive < minutesDepart) {
-                val minutes = minutesArrive + 60 - minutesDepart
-        }
-        else {
-                val minutes = minutesArrive - minutesDepart
-        }
-        return hours * 60 + minutes
-}
+fun travelMinutes(hoursDepart: Int, minutesDepart: Int, hoursArrive: Int, minutesArrive: Int): Int = (hoursArrive - hoursDepart) * 60 + minutesArrive - minutesDepart
 
 /**
  * Простая
@@ -125,7 +114,7 @@ fun travelMinutes(hoursDepart: Int, minutesDepart: Int, hoursArrive: Int, minute
  * Сколько денег будет на счету через 3 года (с учётом сложных процентов)?
  * Например, 100 рублей под 10% годовых превратятся в 133.1 рубля
  */
-fun accountInThreeYears(initial: Int, percent: Int): Double = ((initial * (100 + percent) / 100) * (100 + percent) / 100) * (100 + percent / 100)
+fun accountInThreeYears(initial: Int, percent: Int): Double = initial * (100.0 + percent) / 100.0 * (100.0 + percent) / 100 * (100.0 + percent) / 100
 
 /**
  * Простая

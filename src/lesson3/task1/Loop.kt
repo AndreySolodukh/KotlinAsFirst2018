@@ -102,7 +102,7 @@ fun fib(n: Int): Int {
  */
 fun lcm(m: Int, n: Int): Int {
     var k = kotlin.math.max(m, n)
-    while ((k % m != 0) or (k % n != 0)) k += 1
+    while ((k % m != 0) or (k % n != 0)) k += kotlin.math.max(m, n)
     return k
 }
 
@@ -112,8 +112,12 @@ fun lcm(m: Int, n: Int): Int {
  * Для заданного числа n > 1 найти минимальный делитель, превышающий 1
  */
 fun minDivisor(n: Int): Int {
-    var answer = 2
-    while (n % answer != 0) answer += 1
+    if (n % 2 == 0) return 2
+    var answer = 3
+    while (n % answer != 0) {
+        answer += 2
+        if ((answer * 3) >= n) answer = n
+    }
     return answer
 }
 
@@ -123,7 +127,7 @@ fun minDivisor(n: Int): Int {
  * Для заданного числа n > 1 найти максимальный делитель, меньший n
  */
 fun maxDivisor(n: Int): Int {
-    var answer = n - 1
+    var answer = n / 2
     while (n % answer != 0) answer -= 1
     return answer
 }
@@ -190,6 +194,7 @@ fun collatzSteps(x: Int): Int {
  * Нужную точность считать достигнутой, если очередной член ряда меньше eps по модулю
  */
 fun sin(x: Double, eps: Double): Double { // ???  -  не работает с x = 100 * PI
+    if (((x / (kotlin.math.PI)) % 2 == 0.0) or ((x / (kotlin.math.PI) + 1) % 2 == 0.0)) return 0.0
     var answer = x
     var numerator = x * x * x
     var denominator = 6.0
@@ -213,12 +218,14 @@ fun sin(x: Double, eps: Double): Double { // ???  -  не работает с x 
  * Нужную точность считать достигнутой, если очередной член ряда меньше eps по модулю
  */
 fun cos(x: Double, eps: Double): Double { // ???  -  не работает с x = 100 * PI
+    if ((x / (kotlin.math.PI)) % 2 == 0.0) return 1.0
+    if ((x / kotlin.math.PI + 1) % 2 == 0.0) return -1.0
     var answer = 1.0
-    var numerator = x * x + 0.0
+    var numerator = x * x
     var denominator = 2.0
-    var solver = 2.0
+    var solver = 2
     var count = 1
-    while (eps <= kotlin.math.abs(numerator / denominator + 0.0)) {
+    while (eps <= kotlin.math.abs(numerator / denominator)) {
         if (count % 2 != 0) answer -= (numerator / denominator) else answer += (numerator / denominator)
         solver += 2
         denominator *= ((solver - 1) * solver)

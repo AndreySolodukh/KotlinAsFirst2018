@@ -68,7 +68,9 @@ fun seconds(hours: Int, minutes: Int, seconds: Int): Int = (hours * 60 * 60) + (
  * Определить длину того же отрезка в метрах (в данном случае 18.98).
  * 1 сажень = 3 аршина = 48 вершков, 1 вершок = 4.445 см.
  */
-fun lengthInMeters(sagenes: Int, arshins: Int, vershoks: Int): Double = sagenes * 213.36 / 100 + arshins * 71.12 / 100 + vershoks * 4.445 / 100
+fun lengthInMeters(sagenes: Int, arshins: Int, vershoks: Int): Double =
+        sagenes * (4.445 * 48) / 100 + arshins * (4.445 * 48 / 3) / 100 + vershoks * 4.445 / 100
+
 
 /**
  * Тривиальная
@@ -84,7 +86,7 @@ fun angleInRadian(grad: Int, min: Int, sec: Int): Double = (grad + min / 60.0 + 
  * Найти длину отрезка, соединяющего точки на плоскости с координатами (x1, y1) и (x2, y2).
  * Например, расстояние между (3, 0) и (0, 4) равно 5
  */
-fun trackLength(x1: Double, y1: Double, x2: Double, y2: Double): Double = sqrt(sqr(abs(x1 - x2)) + sqr(abs(y1 - y2)))
+fun trackLength(x1: Double, y1: Double, x2: Double, y2: Double): Double = sqrt(sqr(x1 - x2) + sqr(y1 - y2))
 
 /**
  * Простая
@@ -92,11 +94,7 @@ fun trackLength(x1: Double, y1: Double, x2: Double, y2: Double): Double = sqrt(s
  * Пользователь задает целое число, большее 100 (например, 3801).
  * Определить третью цифру справа в этом числе (в данном случае 8).
  */
-fun thirdDigit(number: Int): Int {
-    val answer: Int
-    if (number > 999) answer = number - ((number / 1000) * 1000) else answer = number
-    return answer / 100
-}
+fun thirdDigit(number: Int): Int = number / 100 % 10
 
 /**
  * Простая
@@ -105,7 +103,8 @@ fun thirdDigit(number: Int): Int {
  * прибыл на станцию назначения в h2 часов m2 минут того же дня (например в 13:01).
  * Определите время поезда в пути в минутах (в данном случае 216).
  */
-fun travelMinutes(hoursDepart: Int, minutesDepart: Int, hoursArrive: Int, minutesArrive: Int): Int = (hoursArrive - hoursDepart) * 60 + minutesArrive - minutesDepart
+fun travelMinutes(hoursDepart: Int, minutesDepart: Int, hoursArrive: Int, minutesArrive: Int): Int =
+        (hoursArrive - hoursDepart) * 60 + minutesArrive - minutesDepart
 
 /**
  * Простая
@@ -114,7 +113,8 @@ fun travelMinutes(hoursDepart: Int, minutesDepart: Int, hoursArrive: Int, minute
  * Сколько денег будет на счету через 3 года (с учётом сложных процентов)?
  * Например, 100 рублей под 10% годовых превратятся в 133.1 рубля
  */
-fun accountInThreeYears(initial: Int, percent: Int): Double = initial * (100.0 + percent) / 100.0 * (100.0 + percent) / 100 * (100.0 + percent) / 100
+fun accountInThreeYears(initial: Int, percent: Int): Double =
+        initial * (100.0 + percent) / 100.0 * (100.0 + percent) / 100 * (100.0 + percent) / 100
 
 /**
  * Простая

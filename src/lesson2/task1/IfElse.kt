@@ -7,6 +7,8 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.sqrt
 
+fun sqr(a: Double): Double = a * a
+
 /**
  * Пример
  *
@@ -80,22 +82,10 @@ fun ageDescription(age: Int): String = when {
  */
 fun timeForHalfWay(t1: Double, v1: Double,
                    t2: Double, v2: Double,
-                   t3: Double, v3: Double): Double
-        /** Первый вариант программы
-         * {
-        val s1 = v1 * t1
-        val s2 = v2 * t2
-        val s3 = v3 * t3
-        var s = (s1 + s2 + s3) / 2.0
-        if (s1 < s) s = s - s1 else return (s / v1)
-        if (s2 < s) return ((s - s2) / v3 + t1 + t2) else return ((s / v2) + t1)
-
-        }
-         */
-{
+                   t3: Double, v3: Double): Double {
     var s = (((v1 * t1) + (v2 * t2) + (v3 * t3)) / 2.0)
-    if (v1 * t1 < s) s = s - v1 * t1 else return (s / v1)
-    if ((v2 * t2) < s) return ((s - (v2 * t2)) / v3 + t1 + t2) else return ((s / v2) + t1)
+    if (v1 * t1 < s) s -= v1 * t1 else return (s / v1)
+    return if ((v2 * t2) < s) ((s - (v2 * t2)) / v3 + t1 + t2) else ((s / v2) + t1)
 
 }
 
@@ -111,9 +101,9 @@ fun timeForHalfWay(t1: Double, v1: Double,
 fun whichRookThreatens(kingX: Int, kingY: Int,
                        rookX1: Int, rookY1: Int,
                        rookX2: Int, rookY2: Int): Int = when {
-    (rookX1 == kingX) or (rookY1 == kingY) and (rookX2 == kingX) or (rookY2 == kingY) -> 3
-    (rookX1 == kingX) or (rookY1 == kingY) -> 1
-    (rookX2 == kingX) or (rookY2 == kingY) -> 2
+    (rookX1 == kingX) || (rookY1 == kingY) && (rookX2 == kingX) || (rookY2 == kingY) -> 3
+    (rookX1 == kingX) || (rookY1 == kingY) -> 1
+    (rookX2 == kingX) || (rookY2 == kingY) -> 2
     else -> 0
 }
 
@@ -130,9 +120,9 @@ fun whichRookThreatens(kingX: Int, kingY: Int,
 fun rookOrBishopThreatens(kingX: Int, kingY: Int,
                           rookX: Int, rookY: Int,
                           bishopX: Int, bishopY: Int): Int = when {
-    (rookX == kingX) or (rookY == kingY) and (kotlin.math.abs(bishopX - kingX) == kotlin.math.abs(bishopY - kingY)) -> 3
-    kotlin.math.abs(bishopX - kingX) == kotlin.math.abs(bishopY - kingY) -> 2
-    (rookX == kingX) or (rookY == kingY) -> 1
+    (rookX == kingX) || (rookY == kingY) && (abs(bishopX - kingX) == abs(bishopY - kingY)) -> 3
+    abs(bishopX - kingX) == abs(bishopY - kingY) -> 2
+    (rookX == kingX) || (rookY == kingY) -> 1
     else -> 0
 }
 
@@ -145,9 +135,9 @@ fun rookOrBishopThreatens(kingX: Int, kingY: Int,
  * Если такой треугольник не существует, вернуть -1.
  */
 fun triangleKind(a: Double, b: Double, c: Double): Int = when {
-    ((a + b) <= c) or ((a + c) <= b) or ((b + c) <= a) -> -1
-    ((a * a) + (b * b) == (c * c)) or ((a * a) + (c * c) == (b * b)) or ((b * b) + (c * c) == (a * a)) -> 1
-    (a * a + b * b > c * c) and (a * a + c * c > b * b) and (b * b + c * c > a * a) -> 0
+    maxOf(a, b, c) * 2 >= a + b + c -> -1
+    sqr(maxOf(a, b, c)) * 2 == sqr(a) + sqr(b) + sqr(c) -> 1
+    sqr(maxOf(a, b, c)) * 2 < sqr(a) + sqr(b) + sqr(c) -> 0
     else -> 2
 }
 
@@ -160,9 +150,9 @@ fun triangleKind(a: Double, b: Double, c: Double): Int = when {
  * Если пересечения нет, вернуть -1.
  */
 fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int = when {
-    ((a < c) and (b < c)) or ((a > d) and (b > d)) -> -1
-    (a <= c) and (b >= d) -> d - c
-    (c <= a) and (d >= b) -> b - a
-    (a < c) and (b < d) -> d - a - (c - a) - (d - b)
-    else -> b - c - (a - c) - (b - d)
+    (maxOf(a, b) < c) || (minOf(a, b) > d) -> -1
+    (a <= c) && (b >= d) -> d - c
+    (c <= a) && (d >= b) -> b - a
+    (a < c) && (b < d) -> b - c
+    else -> d - a
 }

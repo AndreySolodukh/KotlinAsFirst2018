@@ -1,7 +1,13 @@
 @file:Suppress("UNUSED_PARAMETER")
+
 package lesson3.task1
 
+
 import kotlin.math.sqrt
+import kotlin.math.PI
+import kotlin.math.min
+import kotlin.math.max
+import kotlin.math.abs
 
 /**
  * Пример
@@ -38,7 +44,7 @@ fun isPrime(n: Int): Boolean {
  */
 fun isPerfect(n: Int): Boolean {
     var sum = 1
-    for (m in 2..n/2) {
+    for (m in 2..n / 2) {
         if (n % m > 0) continue
         sum += m
         if (sum > n) break
@@ -126,11 +132,7 @@ fun minDivisor(n: Int): Int {
  *
  * Для заданного числа n > 1 найти максимальный делитель, меньший n
  */
-fun maxDivisor(n: Int): Int {
-    var answer = n / 2
-    while (n % answer != 0) answer -= 1
-    return answer
-}
+fun maxDivisor(n: Int): Int = n / minDivisor(n)
 
 /**
  * Простая
@@ -140,7 +142,15 @@ fun maxDivisor(n: Int): Int {
  * Например, 25 и 49 взаимно простые, а 6 и 8 -- нет.
  */
 fun isCoPrime(m: Int, n: Int): Boolean {
-    for (i in 2..kotlin.math.min(m, n)) if ((m % i == 0) and (n % i == 0)) return false
+    var x = n
+    var y = m
+    while ((x != 1) and (y != 1)) {
+        when {
+            maxOf(x, y) % minOf(x, y) == 0 -> return false
+            y > x -> y = maxOf(y, x) % minOf(x, y)
+            else -> x = maxOf(x, y) % minOf(x, y)
+        }
+    }
     return true
 }
 
@@ -153,8 +163,8 @@ fun isCoPrime(m: Int, n: Int): Boolean {
  */
 fun squareBetweenExists(m: Int, n: Int): Boolean {
     var i = 0
-    while (i <= kotlin.math.sqrt(kotlin.math.max(m, n) + 0.0)) {
-        if ((i * i >= kotlin.math.min(m, n)) and (i * i <= kotlin.math.max(m, n))) return true
+    while (i <= sqrt(max(m, n) + 0.0)) {
+        if ((i * i >= min(m, n)) and (i * i <= max(m, n))) return true
         i += 1
     }
     return false
@@ -193,14 +203,14 @@ fun collatzSteps(x: Int): Int {
  * sin(x) = x - x^3 / 3! + x^5 / 5! - x^7 / 7! + ...
  * Нужную точность считать достигнутой, если очередной член ряда меньше eps по модулю
  */
-fun sin(x: Double, eps: Double): Double { // ???  -  не работает с x = 100 * PI
-    if (((x / (kotlin.math.PI)) % 2 == 0.0) or ((x / (kotlin.math.PI) + 1) % 2 == 0.0)) return 0.0
+fun sin(x: Double, eps: Double): Double {
+    if (((x / PI) % 2 == 0.0) || ((x / PI + 1) % 2 == 0.0)) return 0.0
     var answer = x
     var numerator = x * x * x
     var denominator = 6.0
     var solver = 3.0
     var count = 1
-    while (eps <= kotlin.math.abs(numerator / denominator + 0.0)) {
+    while (eps <= abs(numerator / denominator + 0.0)) {
         if (count % 2 != 0) answer -= (numerator / denominator) else answer += (numerator / denominator)
         solver += 2
         denominator *= ((solver - 1) * solver)
@@ -217,15 +227,15 @@ fun sin(x: Double, eps: Double): Double { // ???  -  не работает с x 
  * cos(x) = 1 - x^2 / 2! + x^4 / 4! - x^6 / 6! + ...
  * Нужную точность считать достигнутой, если очередной член ряда меньше eps по модулю
  */
-fun cos(x: Double, eps: Double): Double { // ???  -  не работает с x = 100 * PI
-    if ((x / (kotlin.math.PI)) % 2 == 0.0) return 1.0
-    if ((x / kotlin.math.PI + 1) % 2 == 0.0) return -1.0
+fun cos(x: Double, eps: Double): Double {
+    if ((x / (PI)) % 2 == 0.0) return 1.0
+    if ((x / PI + 1) % 2 == 0.0) return -1.0
     var answer = 1.0
     var numerator = x * x
     var denominator = 2.0
     var solver = 2
     var count = 1
-    while (eps <= kotlin.math.abs(numerator / denominator)) {
+    while (eps <= abs(numerator / denominator)) {
         if (count % 2 != 0) answer -= (numerator / denominator) else answer += (numerator / denominator)
         solver += 2
         denominator *= ((solver - 1) * solver)
@@ -244,16 +254,9 @@ fun cos(x: Double, eps: Double): Double { // ???  -  не работает с x 
  * Использовать операции со строками в этой задаче запрещается.
  */
 fun revert(n: Int): Int {
-    if (n < 10) return n
     var workableN = n
-    var length = 0
     var answer = 0
     while (workableN > 0) {
-        workableN /= 10
-        length += 1
-    }
-    workableN = n
-    for (i in 1..length) {
         answer = answer * 10 + workableN % 10
         workableN /= 10
     }
@@ -269,25 +272,7 @@ fun revert(n: Int): Int {
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun isPalindrome(n: Int): Boolean {
-    if (n < 10) return true
-    var workableN = n
-    var helper = 0
-    while (workableN > 0) {
-        workableN /= 10
-        helper += 1
-    }
-    workableN = n
-    val length = helper
-    helper = 0
-    for (i in 1..(length / 2)) {
-        helper = helper * 10 + workableN % 10
-        workableN /= 10
-    }
-    workableN = n
-    if (length % 2 == 0) for (i in 1..(length / 2)) workableN /= 10 else for (i in 1..(length / 2+ 1)) workableN /= 10
-    return if (workableN == helper) true else false
-}
+fun isPalindrome(n: Int): Boolean = n == revert(n)
 
 /**
  * Средняя

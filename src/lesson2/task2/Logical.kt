@@ -2,6 +2,8 @@
 package lesson2.task2
 
 import lesson1.task1.sqr
+import kotlin.math.sqrt
+import kotlin.math.abs
 
 /**
  * Пример
@@ -28,7 +30,7 @@ fun isNumberHappy(number: Int): Boolean =
  * Считать, что ферзи не могут загораживать друг друга.
  */
 fun queenThreatens(x1: Int, y1: Int, x2: Int, y2: Int): Boolean =
-        (x1 == x2) || (y1 == y2) || kotlin.math.abs(x1 - x2) == kotlin.math.abs(y1 - y2)
+        (x1 == x2) || (y1 == y2) || abs(x1 - x2) == abs(y1 - y2)
 /**
  * Простая
  *
@@ -52,7 +54,7 @@ fun daysInMonth(month: Int, year: Int): Int = when {
  */
 fun circleInside(x1: Double, y1: Double, r1: Double,
                  x2: Double, y2: Double, r2: Double): Boolean =
-        kotlin.math.sqrt((y2 - y1) * (y2 - y1) + (x2 - x1) * (x2 - x1)) + r1 <= r2
+        sqrt((y2 - y1) * (y2 - y1) + (x2 - x1) * (x2 - x1)) + r1 <= r2
 
 /**
  * Средняя

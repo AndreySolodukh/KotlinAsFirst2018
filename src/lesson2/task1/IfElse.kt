@@ -84,9 +84,11 @@ fun timeForHalfWay(t1: Double, v1: Double,
                    t2: Double, v2: Double,
                    t3: Double, v3: Double): Double {
     var s = (((v1 * t1) + (v2 * t2) + (v3 * t3)) / 2.0)
-    if (v1 * t1 < s) s -= v1 * t1 else return (s / v1)
-    return if ((v2 * t2) < s) ((s - (v2 * t2)) / v3 + t1 + t2) else ((s / v2) + t1)
-
+    return when {
+        v1 * t1 >= s -> s / v1
+        v2 * t2 >= (s - (v1 * t1)) -> ((s - (v1 * t1)) / v2) + t1
+        else -> (s - (v1 * t1) - (v2 * t2)) / v3 + t1 + t2
+    }
 }
 
 /**
@@ -96,14 +98,17 @@ fun timeForHalfWay(t1: Double, v1: Double,
  * Определить, не находится ли король под боем, а если есть угроза, то от кого именно.
  * Вернуть 0, если угрозы нет, 1, если угроза только от первой ладьи, 2, если только от второй ладьи,
  * и 3, если угроза от обеих ладей.
- * Считать, что ладьи не могут загораживать друг друга
+ * Считать, что ладьи не могут загораживать друг друга  --  Уже могут.
  */
 fun whichRookThreatens(kingX: Int, kingY: Int,
                        rookX1: Int, rookY1: Int,
                        rookX2: Int, rookY2: Int): Int = when {
-    (rookX1 == kingX) || (rookY1 == kingY) && (rookX2 == kingX) || (rookY2 == kingY) -> 3
-    (rookX1 == kingX) || (rookY1 == kingY) -> 1
-    (rookX2 == kingX) || (rookY2 == kingY) -> 2
+    (((rookX1 == kingX) || (rookX2 == kingX)) && (rookX1 != rookX2)) &&
+            (((rookY1 == kingY) || (rookY2 == kingY)) && (rookY1 != rookY2)) -> 3
+    ((rookX1 == kingX) && ((rookY1 > rookY2) || (rookX1 != rookX2))) ||
+            ((rookY1 == kingY) && ((rookX1 > rookX2) || (rookY1 != rookY2))) -> 1
+    ((rookX2 == kingX) && ((rookY2 > rookY1) || (rookX2 != rookX1))) ||
+            ((rookY2 == kingY) && ((rookX2 > rookX1) || (rookY2 != rookY1))) -> 2
     else -> 0
 }
 
@@ -120,10 +125,12 @@ fun whichRookThreatens(kingX: Int, kingY: Int,
 fun rookOrBishopThreatens(kingX: Int, kingY: Int,
                           rookX: Int, rookY: Int,
                           bishopX: Int, bishopY: Int): Int = when {
-    (rookX == kingX) || (rookY == kingY) && (abs(bishopX - kingX) == abs(bishopY - kingY)) -> 3
-    abs(bishopX - kingX) == abs(bishopY - kingY) -> 2
+    (rookX == kingX) || (rookY == kingY) &&
+            ((maxOf(bishopX, kingX) - minOf(bishopX, kingX)) == (maxOf(bishopY, kingY) - minOf(bishopY, kingY))) -> 3
+    ((maxOf(bishopX, kingX) - minOf(bishopX, kingX)) == (maxOf(bishopY, kingY) - minOf(bishopY, kingY))) -> 2
     (rookX == kingX) || (rookY == kingY) -> 1
     else -> 0
+// Да, с minOf и maxOf довольно-таки громоздко, но с модулями вообще не работает.
 }
 
 /**

@@ -74,7 +74,7 @@ fun digitCountInNumber(n: Int, m: Int): Int =
  */
 fun digitNumber(n: Int): Int {
     if (n == 0) return 1
-    var workableN = n
+    var workableN = abs(n)
     var answer = 0
     while (workableN > 0) {
         answer += 1
@@ -90,10 +90,9 @@ fun digitNumber(n: Int): Int {
  * Ряд Фибоначчи определён следующим образом: fib(1) = 1, fib(2) = 1, fib(n+2) = fib(n) + fib(n+1)
  */
 fun fib(n: Int): Int {
-    if (n in 1..2) return 1
     var answer = 1
-    var helper = 1
-    for (i in 3..n) {
+    var helper = 0
+    for (i in 2..n) {
         answer += helper
         helper = answer - helper
     }
@@ -107,8 +106,8 @@ fun fib(n: Int): Int {
  * минимальное число k, которое делится и на m и на n без остатка
  */
 fun lcm(m: Int, n: Int): Int {
-    var k = kotlin.math.max(m, n)
-    while ((k % m != 0) or (k % n != 0)) k += kotlin.math.max(m, n)
+    var k = max(m, n)
+    while ((k % m != 0) or (k % n != 0)) k += max(m, n)
     return k
 }
 
@@ -142,13 +141,13 @@ fun maxDivisor(n: Int): Int = n / minDivisor(n)
  * Например, 25 и 49 взаимно простые, а 6 и 8 -- нет.
  */
 fun isCoPrime(m: Int, n: Int): Boolean {
-    var x = n
-    var y = m
-    while ((x != 1) and (y != 1)) {
+    var x = m
+    var y = n
+    while ((x != 1) && (y != 1)) {
         when {
             maxOf(x, y) % minOf(x, y) == 0 -> return false
-            y > x -> y = maxOf(y, x) % minOf(x, y)
-            else -> x = maxOf(x, y) % minOf(x, y)
+            x > y -> x %= y
+            else -> y %= x
         }
     }
     return true
@@ -210,13 +209,13 @@ fun sin(x: Double, eps: Double): Double {
     var denominator = 6.0
     var solver = 3.0
     var count = 1
-    while (eps <= abs(numerator / denominator + 0.0)) {
+    do {
         if (count % 2 != 0) answer -= (numerator / denominator) else answer += (numerator / denominator)
         solver += 2
         denominator *= ((solver - 1) * solver)
         numerator *= x * x
         count += 1
-    }
+    } while (eps <= abs(numerator / denominator + 0.0))
     return answer
 }
 
@@ -235,13 +234,13 @@ fun cos(x: Double, eps: Double): Double {
     var denominator = 2.0
     var solver = 2
     var count = 1
-    while (eps <= abs(numerator / denominator)) {
+    do {
         if (count % 2 != 0) answer -= (numerator / denominator) else answer += (numerator / denominator)
         solver += 2
         denominator *= ((solver - 1) * solver)
         numerator *= x * x
         count += 1
-    }
+    } while (eps <= abs(numerator / denominator))
     return answer
 }
 
@@ -306,7 +305,7 @@ fun squareSequenceDigit(n: Int): Int {
     var workableN = n
     var answer = -1
     var length = 0
-    var input = 42
+    var input: Int
     var square = 1
     while (answer == -1) {
         input = square * square
@@ -340,7 +339,7 @@ fun fibSequenceDigit(n: Int): Int {
     var workableN = n - 2    // Первые 2 элемента проверены в предыдущей строке
     var length = 0
     var input = 1
-    var workableInput = 65536
+    var workableInput: Int
     var fib = 1
     var answer = -1
     while (answer == -1) {

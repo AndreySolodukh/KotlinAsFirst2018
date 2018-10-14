@@ -125,7 +125,7 @@ fun whichRookThreatens(kingX: Int, kingY: Int,
 fun rookOrBishopThreatens(kingX: Int, kingY: Int,
                           rookX: Int, rookY: Int,
                           bishopX: Int, bishopY: Int): Int = when {
-    (rookX == kingX) || (rookY == kingY) &&
+    ((rookX == kingX) || (rookY == kingY)) &&
             ((maxOf(bishopX, kingX) - minOf(bishopX, kingX)) == (maxOf(bishopY, kingY) - minOf(bishopY, kingY))) -> 3
     ((maxOf(bishopX, kingX) - minOf(bishopX, kingX)) == (maxOf(bishopY, kingY) - minOf(bishopY, kingY))) -> 2
     (rookX == kingX) || (rookY == kingY) -> 1

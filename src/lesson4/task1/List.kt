@@ -146,9 +146,9 @@ fun center(list: MutableList<Double>): MutableList<Double> {
  * C = a1b1 + a2b2 + ... + aNbN. Произведение пустых векторов считать равным 0.0.
  */
 fun times(a: List<Double>, b: List<Double>): Double {
-    var answer = 0.0
-    for (i in 0 until a.size) answer += a[i] * b[i]
-    return answer
+    var sum = 0.0
+    for (i in 0 until a.size) sum += a[i] * b[i]
+    return sum
 }
 
 /**
@@ -161,12 +161,12 @@ fun times(a: List<Double>, b: List<Double>): Double {
  */
 fun polynom(p: List<Double>, x: Double): Double {
     var multiplier = 1.0
-    var answer = 0.0
+    var sum = 0.0
     if (p.isNotEmpty()) for (i in 0 until p.size) {
-        answer += p[i] * multiplier
+        sum += p[i] * multiplier
         multiplier *= x
     }
-    return answer
+    return sum
 }
 
 /**
@@ -192,15 +192,15 @@ fun accumulate(list: MutableList<Double>): MutableList<Double> {
  * Множители в списке должны располагаться по возрастанию.
  */
 fun factorize(n: Int): List<Int> {
-    var answer = mutableListOf<Int>()
-    var helper = n
+    var sum = mutableListOf<Int>()
+    var solver = n
     var multiplier = 2
-    while (helper > 1) if (helper % multiplier == 0) {
-        answer.add(multiplier)
-        helper /= multiplier
+    while (solver > 1) if (solver % multiplier == 0) {
+        sum.add(multiplier)
+        solver /= multiplier
         multiplier = 2
     } else multiplier += 1
-    return answer.sorted()
+    return sum.sorted()
     // Требует доработки.
 }
 
@@ -221,19 +221,14 @@ fun factorizeToString(n: Int): String = factorize(n).joinToString(separator = "*
  * например: n = 100, base = 4 -> (1, 2, 1, 0) или n = 250, base = 14 -> (1, 3, 12)
  */
 fun convert(n: Int, base: Int): List<Int> {
-    if (n == 0) return listOf(0)
-    var answer = mutableListOf<Int>()
-    var helper = n
-    while (helper > 0) {
-        answer.add(helper % base)
-        helper /= base
+    if (n == 0) return listOf(0) // Пока не придумал, чем это можно заменить.
+    var sum = mutableListOf<Int>() // Оптимальность вызывает подозрения.
+    var solver = n
+    while (solver > 0) {
+        sum.add(solver % base)
+        solver /= base
     }
-    for (i in 0 until answer.size / 2) {
-        helper = answer[answer.size - 1 - i]
-        answer[answer.size - 1 - i] = answer[i]
-        answer[i] = helper
-    }
-    return answer
+    return sum.reversed()
 }
 
 /**
@@ -247,13 +242,13 @@ fun convert(n: Int, base: Int): List<Int> {
 fun convertToString(n: Int, base: Int): String {
     if (n == 0) return "0"
     val alph = "abcdefghijklmnopqrstuvwxyz"
-    var answer = ""
-    var helper = n
-    while (helper > 0) {
-        answer = if (helper % base < 10) (helper % base).toString() + answer else alph[(helper % base) - 10] + answer
-        helper /= base
+    var sum = ""
+    var solver = n
+    while (solver > 0) {
+        sum += if (solver % base < 10) (solver % base).toString() else alph[(solver % base) - 10]
+        solver /= base
     }
-    return answer
+    return sum.reversed()
 }
 
 /**
@@ -262,6 +257,7 @@ fun convertToString(n: Int, base: Int): String {
  * Перевести число, представленное списком цифр digits от старшей к младшей,
  * из системы счисления с основанием base в десятичную.
  * Например: digits = (1, 3, 12), base = 14 -> 250
+ * !! ( 12 * 14^0 + 3 * 14^1 + 1 * 14^2 == 250 ) !!
  */
 fun decimal(digits: List<Int>, base: Int): Int = TODO()
 
@@ -285,6 +281,29 @@ fun decimalFromString(str: String, base: Int): Int = TODO()
  * Например: 23 = XXIII, 44 = XLIV, 100 = C
  */
 fun roman(n: Int): String = TODO()
+/*
+{
+    var alph = "IVXLCDM" // (val - ?)
+    var sum = ""
+    var solver = n
+    for (i in 1.."n".length) { // (while - ?)
+        when {
+            solver % 10 in 0..3 -> for (j in 1..solver % 10) sum += alph[i - 1]
+            solver % 10 == 4 -> sum = sum + alph[i] + alph[i - 1]
+            solver % 10 in 5..8 -> {
+                for (j in 1..solver % 10 - 5) sum += alph[i - 1]
+                sum += alph[i]
+            }
+            else -> sum = sum + alph[i + 1] + alph[i - 1]
+        }
+        alph.drop(2) // (drop(?))
+        solver /= 10
+        println(" sum - $sum")
+        println(" alph - $alph")
+    }
+    return sum.reversed()
+}
+*/
 
 /**
  * Очень сложная
@@ -294,74 +313,74 @@ fun roman(n: Int): String = TODO()
  * 23964 = "двадцать три тысячи девятьсот шестьдесят четыре"
  */
 fun russian(n: Int): String {
-    val deg12 = listOf("одна", "две", "один", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять", "десять",
-            "одиннадцать", "двенадцать", "тринадцать", "четырнадцать", "пятнадцать", "шестнадцать", "семнадцать",
-            "восемнадцать", "девятнадцать")
+    val deg12 = listOf("одна", "две", "один", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять",
+            "десять", "одиннадцать", "двенадцать", "тринадцать", "четырнадцать", "пятнадцать", "шестнадцать",
+            "семнадцать", "восемнадцать", "девятнадцать")
     val deg2 = listOf("двадцать", "тридцать", "сорок", "пятьдесят", "шестьдесят", "семьдесят", "восемьдесят",
             "девяносто")
     val deg3 = listOf("сто", "двести", "триста", "четыреста", "пятьсот", "шестьсот", "семьсот", "восемьсот",
             "девятьсот")
     val opti = listOf("тысяча", "тысячи", "тысяч")
-    var helper = n
-    var answer = ""
+    var solver = n
+    var sum = ""
     var count = 0
-    while (helper > 0) {
+    while (solver > 0) {
         count += 1
-        if ((count == 1) and ((helper % 100) in 1..19)) {
-            answer = deg12[helper % 100 + 1]
+        if ((count == 1) and ((solver % 100) in 1..19)) {
+            sum = deg12[solver % 100 + 1]
             count += 1
-            helper /= 100
+            solver /= 100
             continue
         }
         if (count == 4) {
             when {
-                (helper % 10 == 1) and (helper % 100 != 11) -> {
-                    answer = deg12[0] + " " + opti[0] + " " + answer
-                    helper /= 10
+                (solver % 10 == 1) and (solver % 100 != 11) -> {
+                    sum = deg12[0] + " " + opti[0] + " " + sum
+                    solver /= 10
                 }
 
-                helper % 100 in 11..19 -> {
-                    answer = deg12[helper % 100 + 1] + " " + opti[2] + " " + answer
-                    helper /= 100
+                solver % 100 in 11..19 -> {
+                    sum = deg12[solver % 100 + 1] + " " + opti[2] + " " + sum
+                    solver /= 100
                     count += 1
                 }
-                helper % 10 == 2 -> {
-                    answer = deg12[1] + " " + opti[1] + " " + answer
-                    helper /= 10
+                solver % 10 == 2 -> {
+                    sum = deg12[1] + " " + opti[1] + " " + sum
+                    solver /= 10
                 }
-                helper % 10 in 3..4 -> {
-                    answer = deg12[helper % 10 + 1] + " " + opti[1] + " " + answer
-                    helper /= 10
+                solver % 10 in 3..4 -> {
+                    sum = deg12[solver % 10 + 1] + " " + opti[1] + " " + sum
+                    solver /= 10
                 }
-                helper % 100 == 0 -> {
+                solver % 100 == 0 -> {
                     count += 1
-                    helper /= 100
-                    answer = opti[2] + " " + answer
+                    solver /= 100
+                    sum = opti[2] + " " + sum
                 }
-                helper % 100 == 10 -> {
-                    answer = deg12[11] + " " + opti[2] + " " + answer
-                    helper /= 100
+                solver % 100 == 10 -> {
+                    sum = deg12[11] + " " + opti[2] + " " + sum
+                    solver /= 100
                     count += 1
                 }
-                helper % 10 == 0 -> {
-                    answer = opti[2] + " " + answer
-                    helper /= 10
+                solver % 10 == 0 -> {
+                    sum = opti[2] + " " + sum
+                    solver /= 10
                 }
                 else -> {
-                    answer = deg12[helper % 10 + 1] + " " + opti[2] + " " + answer
-                    helper /= 10
+                    sum = deg12[solver % 10 + 1] + " " + opti[2] + " " + sum
+                    solver /= 10
                 }
             }
             continue
         }
-        if (helper % 10 == 0) {
-            helper /= 10
+        if (solver % 10 == 0) {
+            solver /= 10
             continue
         }
-        if (count == 1) answer = deg12[helper % 10 + 1] + answer
-        if ((count == 2) or (count == 5)) answer = deg2[helper % 10 - 2] + " " + answer
-        if ((count == 3) or (count == 6)) answer = deg3[helper % 10 - 1] + " " + answer
-        helper /= 10
+        if (count == 1) sum = deg12[solver % 10 + 1] + sum
+        if ((count == 2) or (count == 5)) sum = deg2[solver % 10 - 2] + " " + sum
+        if ((count == 3) or (count == 6)) sum = deg3[solver % 10 - 1] + " " + sum
+        solver /= 10
     }
-    return answer.trim()
+    return sum.trim()
 }

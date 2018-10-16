@@ -203,25 +203,15 @@ fun collatzSteps(x: Int): Int {
  * Нужную точность считать достигнутой, если очередной член ряда меньше eps по модулю.
  */
 fun sin(x: Double, eps: Double): Double {
-    // if (((x / PI) % 2 == 0.0) || ((x / PI + 1) % 2 == 0.0)) return 0.0
-    // var count = 1
-    // var numerator = x * x * x
-    // var x2 = x
-    // while (x2 > PI * 2) x2 -= PI * 2
     val x2 = x % (PI * 2)
     var sum = x2
     var numerator = x2 * x2 * (-x2)
-    var denominator = 6.0
-    var solver = 3.0
+    var solver = 3
     do {
-        //    if (count % 2 != 0) sum -= (numerator / denominator) else sum += (numerator / denominator)
-        // count += 1
-        sum += numerator / denominator
+        sum += numerator / factorial(solver)
         solver += 2
-        denominator *= ((solver - 1) * solver)
         numerator *= x2 * (-x2)
-
-    } while (eps <= abs(numerator / denominator))
+    } while (eps <= abs(numerator / factorial(solver)))
     return sum
 }
 
@@ -236,14 +226,12 @@ fun cos(x: Double, eps: Double): Double {
     val x2 = x % (PI * 2)
     var sum = 1.0
     var numerator = x2 * (-x2)
-    var denominator = 2.0
     var solver = 2
     do {
-        sum += numerator / denominator
+        sum += numerator / factorial(solver)
         solver += 2
-        denominator *= ((solver - 1) * solver)
         numerator *= x2 * (-x2)
-    } while (eps <= abs(numerator / denominator))
+    } while (eps <= abs(numerator / factorial(solver)))
     return sum
 }
 

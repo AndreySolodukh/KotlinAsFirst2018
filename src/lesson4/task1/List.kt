@@ -221,6 +221,7 @@ fun factorizeToString(n: Int): String = factorize(n).joinToString(separator = "*
  * например: n = 100, base = 4 -> (1, 2, 1, 0) или n = 250, base = 14 -> (1, 3, 12)
  */
 fun convert(n: Int, base: Int): List<Int> {
+    if (n == 0) return listOf(0)
     var answer = mutableListOf<Int>()
     var helper = n
     while (helper > 0) {
@@ -244,6 +245,7 @@ fun convert(n: Int, base: Int): List<Int> {
  * Например: n = 100, base = 4 -> 1210, n = 250, base = 14 -> 13c
  */
 fun convertToString(n: Int, base: Int): String {
+    if (n == 0) return "0"
     val alph = "abcdefghijklmnopqrstuvwxyz"
     var answer = ""
     var helper = n
@@ -292,21 +294,21 @@ fun roman(n: Int): String = TODO()
  * 23964 = "двадцать три тысячи девятьсот шестьдесят четыре"
  */
 fun russian(n: Int): String {
-    val deg12 = listOf("одна", "один", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять", "десять",
+    val deg12 = listOf("одна", "две", "один", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять", "десять",
             "одиннадцать", "двенадцать", "тринадцать", "четырнадцать", "пятнадцать", "шестнадцать", "семнадцать",
             "восемнадцать", "девятнадцать")
     val deg2 = listOf("двадцать", "тридцать", "сорок", "пятьдесят", "шестьдесят", "семьдесят", "восемьдесят",
             "девяносто")
     val deg3 = listOf("сто", "двести", "триста", "четыреста", "пятьсот", "шестьсот", "семьсот", "восемьсот",
             "девятьсот")
-    val opti = listOf("тысяча", "тысячи", "тысяч", "две")
+    val opti = listOf("тысяча", "тысячи", "тысяч")
     var helper = n
     var answer = ""
     var count = 0
     while (helper > 0) {
         count += 1
         if ((count == 1) and ((helper % 100) in 1..19)) {
-            answer = deg12[helper % 100]
+            answer = deg12[helper % 100 + 1]
             count += 1
             helper /= 100
             continue
@@ -317,17 +319,18 @@ fun russian(n: Int): String {
                     answer = deg12[0] + " " + opti[0] + " " + answer
                     helper /= 10
                 }
+
                 helper % 100 in 11..19 -> {
-                    answer = deg12[helper % 100] + " " + opti[2] + " " + answer
+                    answer = deg12[helper % 100 + 1] + " " + opti[2] + " " + answer
                     helper /= 100
                     count += 1
                 }
                 helper % 10 == 2 -> {
-                    answer = opti[3] + " " + opti[1] + " " + answer
+                    answer = deg12[1] + " " + opti[1] + " " + answer
                     helper /= 10
                 }
                 helper % 10 in 3..4 -> {
-                    answer = deg12[helper % 10] + " " + opti[1] + " " + answer
+                    answer = deg12[helper % 10 + 1] + " " + opti[1] + " " + answer
                     helper /= 10
                 }
                 helper % 100 == 0 -> {
@@ -336,12 +339,16 @@ fun russian(n: Int): String {
                     answer = opti[2] + " " + answer
                 }
                 helper % 100 == 10 -> {
-                    answer = deg12[10] + " " + opti[2] + " " + answer
+                    answer = deg12[11] + " " + opti[2] + " " + answer
                     helper /= 100
                     count += 1
                 }
+                helper % 10 == 0 -> {
+                    answer = opti[2] + " " + answer
+                    helper /= 10
+                }
                 else -> {
-                    answer = deg12[helper % 10] + " " + opti[2] + " " + answer
+                    answer = deg12[helper % 10 + 1] + " " + opti[2] + " " + answer
                     helper /= 10
                 }
             }
@@ -351,7 +358,7 @@ fun russian(n: Int): String {
             helper /= 10
             continue
         }
-        if (count == 1) answer = deg12[helper % 10] + answer
+        if (count == 1) answer = deg12[helper % 10 + 1] + answer
         if ((count == 2) or (count == 5)) answer = deg2[helper % 10 - 2] + " " + answer
         if ((count == 3) or (count == 6)) answer = deg3[helper % 10 - 1] + " " + answer
         helper /= 10

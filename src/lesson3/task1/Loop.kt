@@ -203,20 +203,26 @@ fun collatzSteps(x: Int): Int {
  * Нужную точность считать достигнутой, если очередной член ряда меньше eps по модулю
  */
 fun sin(x: Double, eps: Double): Double {
-    if (((x / PI) % 2 == 0.0) || ((x / PI + 1) % 2 == 0.0)) return 0.0
-    var answer = x
-    var numerator = x * x * x
+    // if (((x / PI) % 2 == 0.0) || ((x / PI + 1) % 2 == 0.0)) return 0.0
+    // var count = 1
+    // var numerator = x * x * x
+    // var x2 = x
+    // while (x2 > PI * 2) x2 -= PI * 2
+    val x2 = x % (PI * 2)
+    var sum = x2
+    var numerator = x2 * x2 * (-x2)
     var denominator = 6.0
     var solver = 3.0
-    var count = 1
     do {
-        if (count % 2 != 0) answer -= (numerator / denominator) else answer += (numerator / denominator)
+        //    if (count % 2 != 0) sum -= (numerator / denominator) else sum += (numerator / denominator)
+        // count += 1
+        sum += numerator / denominator
         solver += 2
         denominator *= ((solver - 1) * solver)
-        numerator *= x * x
-        count += 1
-    } while (eps <= abs(numerator / denominator + 0.0))
-    return answer
+        numerator *= x2 * (-x2)
+
+    } while (eps <= abs(numerator / denominator))
+    return sum
 }
 
 /**
@@ -227,21 +233,18 @@ fun sin(x: Double, eps: Double): Double {
  * Нужную точность считать достигнутой, если очередной член ряда меньше eps по модулю
  */
 fun cos(x: Double, eps: Double): Double {
-    if ((x / (PI)) % 2 == 0.0) return 1.0
-    if ((x / PI + 1) % 2 == 0.0) return -1.0
-    var answer = 1.0
-    var numerator = x * x
+    val x2 = x % (PI * 2)
+    var sum = 1.0
+    var numerator = x2 * (-x2)
     var denominator = 2.0
     var solver = 2
-    var count = 1
     do {
-        if (count % 2 != 0) answer -= (numerator / denominator) else answer += (numerator / denominator)
+        sum += numerator / denominator
         solver += 2
         denominator *= ((solver - 1) * solver)
-        numerator *= x * x
-        count += 1
+        numerator *= x2 * (-x2)
     } while (eps <= abs(numerator / denominator))
-    return answer
+    return sum
 }
 
 

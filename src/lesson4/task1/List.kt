@@ -5,6 +5,12 @@ package lesson4.task1
 import lesson1.task1.discriminant
 import kotlin.math.sqrt
 
+fun grade(input: Int, number: Int): Int {
+    var sum = 1
+    for (i in 1..number) sum *= input
+    return sum
+}
+
 /**
  * Пример
  *
@@ -194,15 +200,18 @@ fun accumulate(list: MutableList<Double>): MutableList<Double> {
 fun factorize(n: Int): List<Int> {
     var sum = mutableListOf<Int>()
     var solver = n
-    var multiplier = 2
-    while (solver > 1) if (solver % multiplier == 0) {
-        sum.add(multiplier)
-        solver /= multiplier
-        multiplier = 2
-    } else multiplier += 1
+    while (solver % 2 == 0) {
+        solver /= 2
+        sum.add(2)
+    }
+    for (i in 3..solver / 3 step 2) while (solver % i == 0) {
+        solver /= i
+        sum.add(i)
+    }
+    if (solver != 1) sum.add(solver)
     return sum.sorted()
-    // Требует доработки.
 }
+
 
 /**
  * Сложная
@@ -221,8 +230,8 @@ fun factorizeToString(n: Int): String = factorize(n).joinToString(separator = "*
  * например: n = 100, base = 4 -> (1, 2, 1, 0) или n = 250, base = 14 -> (1, 3, 12)
  */
 fun convert(n: Int, base: Int): List<Int> {
-    if (n == 0) return listOf(0) // Пока не придумал, чем это можно заменить.
-    var sum = mutableListOf<Int>() // Оптимальность вызывает подозрения.
+    if (n == 0) return listOf(0)
+    var sum = mutableListOf<Int>()
     var solver = n
     while (solver > 0) {
         sum.add(solver % base)
@@ -257,9 +266,14 @@ fun convertToString(n: Int, base: Int): String {
  * Перевести число, представленное списком цифр digits от старшей к младшей,
  * из системы счисления с основанием base в десятичную.
  * Например: digits = (1, 3, 12), base = 14 -> 250
- * !! ( 12 * 14^0 + 3 * 14^1 + 1 * 14^2 == 250 ) !!
+ *
+ *                          !! ( 12 * 14^0 + 3 * 14^1 + 1 * 14^2 == 250 ) !!
  */
-fun decimal(digits: List<Int>, base: Int): Int = TODO()
+fun decimal(digits: List<Int>, base: Int): Int {
+    var sum = 0
+    for (i in digits.size - 1 downTo 0) sum += (digits[digits.size - 1 - i] * grade(base, i))
+    return sum
+}
 
 /**
  * Сложная
@@ -270,7 +284,12 @@ fun decimal(digits: List<Int>, base: Int): Int = TODO()
  * 10 -> a, 11 -> b, 12 -> c и так далее.
  * Например: str = "13c", base = 14 -> 250
  */
-fun decimalFromString(str: String, base: Int): Int = TODO()
+fun decimalFromString(str: String, base: Int): Int {
+    var sum = 0
+    val alph = "0123456789abcdefghijklmnopqrstuvwxyz"
+    for (i in str.length - 1 downTo 0) sum += alph.indexOf(str[i]) * grade(base, str.length - 1 - i)
+    return sum
+}
 
 /**
  * Сложная
@@ -280,30 +299,24 @@ fun decimalFromString(str: String, base: Int): Int = TODO()
  * 90 = XC, 100 = C, 400 = CD, 500 = D, 900 = CM, 1000 = M.
  * Например: 23 = XXIII, 44 = XLIV, 100 = C
  */
-fun roman(n: Int): String = TODO()
-/*
-{
-    var alph = "IVXLCDM" // (val - ?)
+fun roman(n: Int): String {
+    val alph = "IVXLCDM"
     var sum = ""
     var solver = n
-    for (i in 1.."n".length) { // (while - ?)
+    for (i in 0..6 step 2) {
         when {
-            solver % 10 in 0..3 -> for (j in 1..solver % 10) sum += alph[i - 1]
-            solver % 10 == 4 -> sum = sum + alph[i] + alph[i - 1]
+            solver % 10 in 0..3 -> for (j in 1..solver % 10) sum += alph[i]
+            solver % 10 == 4 -> sum = sum + alph[i + 1] + alph[i]
             solver % 10 in 5..8 -> {
-                for (j in 1..solver % 10 - 5) sum += alph[i - 1]
-                sum += alph[i]
+                for (j in 1..solver % 10 - 5) sum += alph[i]
+                sum += alph[i + 1]
             }
-            else -> sum = sum + alph[i + 1] + alph[i - 1]
+            else -> sum = sum + alph[i + 2] + alph[i]
         }
-        alph.drop(2) // (drop(?))
-        solver /= 10
-        println(" sum - $sum")
-        println(" alph - $alph")
+        if (solver / 10 == 0) break else solver /= 10
     }
     return sum.reversed()
 }
-*/
 
 /**
  * Очень сложная

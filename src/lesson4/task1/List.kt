@@ -140,7 +140,7 @@ fun mean(list: List<Double>): Double = if (list.isEmpty()) 0.0 else list.sum() /
  */
 fun center(list: MutableList<Double>): MutableList<Double> {
     val mean = mean(list)
-    if (list.isNotEmpty()) for (i in 0 until list.size) list[i] -= mean
+    for (i in 0 until list.size) list[i] -= mean
     return list
 }
 
@@ -168,7 +168,7 @@ fun times(a: List<Double>, b: List<Double>): Double {
 fun polynom(p: List<Double>, x: Double): Double {
     var multiplier = 1.0
     var sum = 0.0
-    if (p.isNotEmpty()) for (i in 0 until p.size) {
+    for (i in 0 until p.size) {
         sum += p[i] * multiplier
         multiplier *= x
     }
@@ -186,7 +186,7 @@ fun polynom(p: List<Double>, x: Double): Double {
  * Обратите внимание, что данная функция должна изменять содержание списка list, а не его копии.
  */
 fun accumulate(list: MutableList<Double>): MutableList<Double> {
-    if (list.isNotEmpty()) for (i in 1 until list.size) list[i] += list[i - 1]
+    for (i in 1 until list.size) list[i] += list[i - 1]
     return list
 }
 
@@ -198,13 +198,14 @@ fun accumulate(list: MutableList<Double>): MutableList<Double> {
  * Множители в списке должны располагаться по возрастанию.
  */
 fun factorize(n: Int): List<Int> {
-    var sum = mutableListOf<Int>()
+    val sum = mutableListOf<Int>()
     var solver = n
     while (solver % 2 == 0) {
         solver /= 2
         sum.add(2)
     }
-    for (i in 3..solver / 3 step 2) while (solver % i == 0) {
+    for (i in 3..solver / 3 step 2)
+        while (solver % i == 0) {
         solver /= i
         sum.add(i)
     }
@@ -231,7 +232,7 @@ fun factorizeToString(n: Int): String = factorize(n).joinToString(separator = "*
  */
 fun convert(n: Int, base: Int): List<Int> {
     if (n == 0) return listOf(0)
-    var sum = mutableListOf<Int>()
+    val sum = mutableListOf<Int>()
     var solver = n
     while (solver > 0) {
         sum.add(solver % base)
@@ -339,7 +340,7 @@ fun russian(n: Int): String {
     var count = 0
     while (solver > 0) {
         count += 1
-        if ((count == 1) and ((solver % 100) in 1..19)) {
+        if ((count == 1) && ((solver % 100) in 1..19)) {
             sum = deg12[solver % 100 + 1]
             count += 1
             solver /= 100
@@ -347,7 +348,7 @@ fun russian(n: Int): String {
         }
         if (count == 4) {
             when {
-                (solver % 10 == 1) and (solver % 100 != 11) -> {
+                (solver % 10 == 1) && (solver % 100 != 11) -> {
                     sum = deg12[0] + " " + opti[0] + " " + sum
                     solver /= 10
                 }
@@ -391,8 +392,8 @@ fun russian(n: Int): String {
             continue
         }
         if (count == 1) sum = deg12[solver % 10 + 1] + sum
-        if ((count == 2) or (count == 5)) sum = deg2[solver % 10 - 2] + " " + sum
-        if ((count == 3) or (count == 6)) sum = deg3[solver % 10 - 1] + " " + sum
+        if ((count == 2) || (count == 5)) sum = deg2[solver % 10 - 2] + " " + sum
+        if ((count == 3) || (count == 6)) sum = deg3[solver % 10 - 1] + " " + sum
         solver /= 10
     }
     return sum.trim()

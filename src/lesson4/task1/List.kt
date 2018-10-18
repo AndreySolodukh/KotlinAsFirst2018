@@ -4,12 +4,15 @@ package lesson4.task1
 
 import lesson1.task1.discriminant
 import kotlin.math.sqrt
+import lesson3.task1.revert
 
 fun grade(input: Int, number: Int): Int {
     var sum = 1
     for (i in 1..number) sum *= input
     return sum
 }
+fun reverser(input: String): String = input.reversed()
+fun trimer(input: String): String = input.trim()
 
 /**
  * Пример
@@ -121,7 +124,7 @@ fun buildSumExample(list: List<Int>) = list.joinToString(separator = " + ", post
  * по формуле abs = sqrt(a1^2 + a2^2 + ... + aN^2).
  * Модуль пустого вектора считать равным 0.0.
  */
-fun abs(v: List<Double>): Double = sqrt(v.map(fun(it: Double) = it * it).sum())
+fun abs(v: List<Double>): Double = sqrt(v.map { it * it }.sum())
 
 /**
  * Простая
@@ -206,9 +209,9 @@ fun factorize(n: Int): List<Int> {
     }
     for (i in 3..solver / 3 step 2)
         while (solver % i == 0) {
-        solver /= i
-        sum.add(i)
-    }
+            solver /= i
+            sum.add(i)
+        }
     if (solver != 1) sum.add(solver)
     return sum.sorted()
 }
@@ -249,17 +252,15 @@ fun convert(n: Int, base: Int): List<Int> {
  * строчными буквами: 10 -> a, 11 -> b, 12 -> c и так далее.
  * Например: n = 100, base = 4 -> 1210, n = 250, base = 14 -> 13c
  */
-fun convertToString(n: Int, base: Int): String {
-    if (n == 0) return "0"
+fun convertToString(n: Int, base: Int): String = reverser(buildString {
+    if (n == 0) append("0")
     val alph = "abcdefghijklmnopqrstuvwxyz"
-    var sum = ""
     var solver = n
     while (solver > 0) {
-        sum += if (solver % base < 10) (solver % base).toString() else alph[(solver % base) - 10]
+        append(if (solver % base < 10) (solver % base).toString() else alph[(solver % base) - 10])
         solver /= base
     }
-    return sum.reversed()
-}
+})
 
 /**
  * Средняя
@@ -300,24 +301,22 @@ fun decimalFromString(str: String, base: Int): Int {
  * 90 = XC, 100 = C, 400 = CD, 500 = D, 900 = CM, 1000 = M.
  * Например: 23 = XXIII, 44 = XLIV, 100 = C
  */
-fun roman(n: Int): String {
+fun roman(n: Int): String = reverser(buildString {
     val alph = "IVXLCDM"
-    var sum = ""
     var solver = n
     for (i in 0..6 step 2) {
         when {
-            solver % 10 in 0..3 -> for (j in 1..solver % 10) sum += alph[i]
-            solver % 10 == 4 -> sum = sum + alph[i + 1] + alph[i]
+            solver % 10 in 0..3 -> for (j in 1..solver % 10) append(alph[i])
+            solver % 10 == 4 -> append(alph[i + 1], alph[i])
             solver % 10 in 5..8 -> {
-                for (j in 1..solver % 10 - 5) sum += alph[i]
-                sum += alph[i + 1]
+                for (j in 1..solver % 10 - 5) append(alph[i])
+                append(alph[i + 1])
             }
-            else -> sum = sum + alph[i + 2] + alph[i]
+            else -> append(alph[i + 2], alph[i])
         }
         if (solver / 10 == 0) break else solver /= 10
     }
-    return sum.reversed()
-}
+})
 
 /**
  * Очень сложная
@@ -326,7 +325,43 @@ fun roman(n: Int): String {
  * Например, 375 = "триста семьдесят пять",
  * 23964 = "двадцать три тысячи девятьсот шестьдесят четыре"
  */
-fun russian(n: Int): String {
+fun russian(n: Int): String = trimer(buildString {
+    val omni = listOf("один", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять", "десять",
+            "одиннадцать", "двенадцать", "тринадцать", "четырнадцать", "пятнадцать", "шестнадцать", "семнадцать",
+            "восемнадцать", "девятнадцать", "двадцать", "тридцать", "сорок", "пятьдесят", "шестьдесят", "семьдесят",
+            "восемьдесят", "девяносто", "сто", "двести", "триста", "четыреста", "пятьсот", "шестьсот", "семьсот",
+            "восемьсот", "девятьсот", "тысяча", "тысячи", "тысяч", "одна", "две")
+    var num: Int
+    var skip = 0
+    for (i in n.toString().length downTo 1) {
+        if (skip == 1) {
+            skip--
+            continue
+        }
+        num = n / grade(10, i - 1) % 10
+        if (i == 3 && n > 999) when {
+            n / grade(10, 4 - 1) % 10 == 1 -> append("${omni[36]} ")
+            n / grade(10, 4 - 1) % 10 in 2..4 -> append("${omni[37]} ")
+            else -> append("${omni[38]} ")
+        }
+        if (num == 0) continue
+        when {
+            i == 6 || i == 3 -> append("${omni[num + 26]} ")
+            (i == 5 || i == 2) && num != 1 -> append("${omni[num + 17]} ")
+            else -> when {
+                i == 5 || i == 2 -> {
+                    append("${omni[9 + n / grade(10, i - 2) % 10]} ")
+                    skip++
+                }
+                i == 4 && num in 1..2 -> append("${omni[num + 38]} ")
+                else -> append("${omni[num - 1]} ")
+            }
+        }
+    }
+})
+/*
+{
+
     val deg12 = listOf("одна", "две", "один", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять",
             "десять", "одиннадцать", "двенадцать", "тринадцать", "четырнадцать", "пятнадцать", "шестнадцать",
             "семнадцать", "восемнадцать", "девятнадцать")
@@ -398,3 +433,4 @@ fun russian(n: Int): String {
     }
     return sum.trim()
 }
+*/

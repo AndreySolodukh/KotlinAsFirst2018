@@ -11,8 +11,6 @@ fun grade(input: Int, number: Int): Int {
     for (i in 1..number) sum *= input
     return sum
 }
-fun reverser(input: String): String = input.reversed()
-fun trimer(input: String): String = input.trim()
 
 /**
  * Пример
@@ -252,7 +250,7 @@ fun convert(n: Int, base: Int): List<Int> {
  * строчными буквами: 10 -> a, 11 -> b, 12 -> c и так далее.
  * Например: n = 100, base = 4 -> 1210, n = 250, base = 14 -> 13c
  */
-fun convertToString(n: Int, base: Int): String = reverser(buildString {
+fun convertToString(n: Int, base: Int): String = buildString {
     if (n == 0) append("0")
     val alph = "abcdefghijklmnopqrstuvwxyz"
     var solver = n
@@ -260,7 +258,7 @@ fun convertToString(n: Int, base: Int): String = reverser(buildString {
         append(if (solver % base < 10) (solver % base).toString() else alph[(solver % base) - 10])
         solver /= base
     }
-})
+}.reversed()
 
 /**
  * Средняя
@@ -301,14 +299,14 @@ fun decimalFromString(str: String, base: Int): Int {
  * 90 = XC, 100 = C, 400 = CD, 500 = D, 900 = CM, 1000 = M.
  * Например: 23 = XXIII, 44 = XLIV, 100 = C
  */
-fun roman(n: Int): String = reverser(buildString {
+fun roman(n: Int): String = buildString {
     val alph = "IVXLCDM"
     var solver = n
     for (i in 0..6 step 2) {
-        when {
-            solver % 10 in 0..3 -> for (j in 1..solver % 10) append(alph[i])
-            solver % 10 == 4 -> append(alph[i + 1], alph[i])
-            solver % 10 in 5..8 -> {
+        when (solver % 10) {
+            in 0..3 -> for (j in 1..solver % 10) append(alph[i])
+            4 -> append(alph[i + 1], alph[i])
+            in 5..8 -> {
                 for (j in 1..solver % 10 - 5) append(alph[i])
                 append(alph[i + 1])
             }
@@ -316,7 +314,7 @@ fun roman(n: Int): String = reverser(buildString {
         }
         if (solver / 10 == 0) break else solver /= 10
     }
-})
+}.reversed()
 
 /**
  * Очень сложная
@@ -325,7 +323,7 @@ fun roman(n: Int): String = reverser(buildString {
  * Например, 375 = "триста семьдесят пять",
  * 23964 = "двадцать три тысячи девятьсот шестьдесят четыре"
  */
-fun russian(n: Int): String = trimer(buildString {
+fun russian(n: Int): String = buildString {
     val omni = listOf("один", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять", "десять",
             "одиннадцать", "двенадцать", "тринадцать", "четырнадцать", "пятнадцать", "шестнадцать", "семнадцать",
             "восемнадцать", "девятнадцать", "двадцать", "тридцать", "сорок", "пятьдесят", "шестьдесят", "семьдесят",
@@ -339,11 +337,12 @@ fun russian(n: Int): String = trimer(buildString {
             continue
         }
         num = n / grade(10, i - 1) % 10
-        if (i == 3 && n > 999) when {
-            n / grade(10, 4 - 1) % 10 == 1 -> append("${omni[36]} ")
-            n / grade(10, 4 - 1) % 10 in 2..4 -> append("${omni[37]} ")
-            else -> append("${omni[38]} ")
-        }
+        if (i == 3 && n > 999)
+            when (n / grade(10, 3) % 10) {
+                1 -> append("${omni[36]} ")
+                in 2..4 -> append("${omni[37]} ")
+                else -> append("${omni[38]} ")
+            }
         if (num == 0) continue
         when {
             i == 6 || i == 3 -> append("${omni[num + 26]} ")
@@ -358,79 +357,4 @@ fun russian(n: Int): String = trimer(buildString {
             }
         }
     }
-})
-/*
-{
-
-    val deg12 = listOf("одна", "две", "один", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять",
-            "десять", "одиннадцать", "двенадцать", "тринадцать", "четырнадцать", "пятнадцать", "шестнадцать",
-            "семнадцать", "восемнадцать", "девятнадцать")
-    val deg2 = listOf("двадцать", "тридцать", "сорок", "пятьдесят", "шестьдесят", "семьдесят", "восемьдесят",
-            "девяносто")
-    val deg3 = listOf("сто", "двести", "триста", "четыреста", "пятьсот", "шестьсот", "семьсот", "восемьсот",
-            "девятьсот")
-    val opti = listOf("тысяча", "тысячи", "тысяч")
-    var solver = n
-    var sum = ""
-    var count = 0
-    while (solver > 0) {
-        count += 1
-        if ((count == 1) && ((solver % 100) in 1..19)) {
-            sum = deg12[solver % 100 + 1]
-            count += 1
-            solver /= 100
-            continue
-        }
-        if (count == 4) {
-            when {
-                (solver % 10 == 1) && (solver % 100 != 11) -> {
-                    sum = deg12[0] + " " + opti[0] + " " + sum
-                    solver /= 10
-                }
-
-                solver % 100 in 11..19 -> {
-                    sum = deg12[solver % 100 + 1] + " " + opti[2] + " " + sum
-                    solver /= 100
-                    count += 1
-                }
-                solver % 10 == 2 -> {
-                    sum = deg12[1] + " " + opti[1] + " " + sum
-                    solver /= 10
-                }
-                solver % 10 in 3..4 -> {
-                    sum = deg12[solver % 10 + 1] + " " + opti[1] + " " + sum
-                    solver /= 10
-                }
-                solver % 100 == 0 -> {
-                    count += 1
-                    solver /= 100
-                    sum = opti[2] + " " + sum
-                }
-                solver % 100 == 10 -> {
-                    sum = deg12[11] + " " + opti[2] + " " + sum
-                    solver /= 100
-                    count += 1
-                }
-                solver % 10 == 0 -> {
-                    sum = opti[2] + " " + sum
-                    solver /= 10
-                }
-                else -> {
-                    sum = deg12[solver % 10 + 1] + " " + opti[2] + " " + sum
-                    solver /= 10
-                }
-            }
-            continue
-        }
-        if (solver % 10 == 0) {
-            solver /= 10
-            continue
-        }
-        if (count == 1) sum = deg12[solver % 10 + 1] + sum
-        if ((count == 2) || (count == 5)) sum = deg2[solver % 10 - 2] + " " + sum
-        if ((count == 3) || (count == 6)) sum = deg3[solver % 10 - 1] + " " + sum
-        solver /= 10
-    }
-    return sum.trim()
-}
-*/
+}.trim()

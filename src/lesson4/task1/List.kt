@@ -4,7 +4,6 @@ package lesson4.task1
 
 import lesson1.task1.discriminant
 import kotlin.math.sqrt
-import lesson3.task1.revert
 
 fun grade(input: Int, number: Int): Int {
     var sum = 1
@@ -338,11 +337,13 @@ fun russian(n: Int): String = buildString {
         }
         num = n / grade(10, i - 1) % 10
         if (i == 3 && n > 999)
-            when (n / grade(10, 3) % 10) {
-                1 -> append("${omni[36]} ")
-                in 2..4 -> append("${omni[37]} ")
-                else -> append("${omni[38]} ")
-            }
+            if (n / grade(10, 4) % 10 != 1)
+                when (n / grade(10, 3) % 10) {
+                    1 -> append("${omni[36]} ")
+                    in 2..4 -> append("${omni[37]} ")
+                    else -> append("${omni[38]} ")
+                }
+            else append("${omni[38]} ")
         if (num == 0) continue
         when {
             i == 6 || i == 3 -> append("${omni[num + 26]} ")

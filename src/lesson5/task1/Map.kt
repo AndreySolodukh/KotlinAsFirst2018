@@ -94,7 +94,12 @@ fun buildWordSet(text: List<String>): MutableSet<String> {
  *     mapOf("Emergency" to "911", "Police" to "02")
  *   ) -> mapOf("Emergency" to "112, 911", "Police" to "02")
  */
-fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<String, String> = TODO()
+fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<String, String> {
+    val sum = mapA.toMutableMap()
+    for ((key, entry) in mapB)
+        if ((sum[key] != entry) && (sum[key] != null)) sum[key] = "${sum[key]}, $entry" else sum[key] = entry
+    return sum
+}
 
 /**
  * Простая
@@ -106,7 +111,23 @@ fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<S
  *   buildGrades(mapOf("Марат" to 3, "Семён" to 5, "Михаил" to 5))
  *     -> mapOf(5 to listOf("Семён", "Михаил"), 3 to listOf("Марат"))
  */
-fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> = TODO()
+fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> {
+    val sum = mutableMapOf<Int, List<String>>()
+    val slv = mutableListOf<String>()
+    for (i in 2..5) {
+        for ((string, int) in grades) if (int == i) slv.add(string)
+        val slv2 = mutableListOf<String>()
+        for (j in slv) slv2.add(j)
+        if (slv2.isNotEmpty()) sum[i] = slv2
+        /*
+            if (slv.isNotEmpty()) sum[i] = slv
+        В sum[i] записывается ССЫЛКА на множество slv, >>> slv.clear() чистит результат.
+        Требуется доработка. - *доработано с помощью slv2.
+        */
+        slv.clear()
+    }
+    return sum
+}
 
 /**
  * Простая
@@ -118,7 +139,10 @@ fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> = TODO()
  *   containsIn(mapOf("a" to "z"), mapOf("a" to "z", "b" to "sweet")) -> true
  *   containsIn(mapOf("a" to "z"), mapOf("a" to "zee", "b" to "sweet")) -> false
  */
-fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean = TODO()
+fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean {
+    for ((x, y) in a) if (b[x] != y) return false
+    return true
+}
 
 /**
  * Средняя
@@ -130,7 +154,20 @@ fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean = TODO()
  *   averageStockPrice(listOf("MSFT" to 100.0, "MSFT" to 200.0, "NFLX" to 40.0))
  *     -> mapOf("MSFT" to 150.0, "NFLX" to 40.0)
  */
-fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Double> = TODO()
+fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Double> {
+    val sum = mutableMapOf<String, Double>()
+    var count = 0
+    for ((string) in stockPrices) sum[string] = 0.0
+    for ((ss) in sum) {
+        for ((string, double) in stockPrices) if (ss == string) {
+            sum[ss] = sum[ss]!! + double
+            count++
+        }
+        sum[ss] = sum[ss]!! / count
+        count = 0
+    }
+    return sum
+}
 
 /**
  * Средняя
@@ -147,7 +184,17 @@ fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Doub
  *     "печенье"
  *   ) -> "Мария"
  */
-fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): String? = TODO()
+fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): String? {
+    var sum = -1.0
+    var slv = ""
+    // Если написать slv: String, в return выходит ошибка "slv must be initialized"
+    for ((name, pair) in stuff)
+        if (pair.first == kind && (sum > pair.second || sum == -1.0)) {
+            sum = pair.second
+            slv = name
+        }
+    return if (sum != -1.0) slv else null
+}
 
 /**
  * Сложная
@@ -173,7 +220,26 @@ fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): S
  *          "Mikhail" to setOf("Sveta", "Marat")
  *        )
  */
-fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<String>> = TODO()
+fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<String>> {
+    val used = mutableSetOf<String>()
+    val sum = mutableMapOf<String, Set<String>>()
+    for ((a, b) in friends) {
+        used.add(a)
+        for (c in b) used.add(c)
+    }
+    return TODO()
+    /*
+    Пока не очень понятно, как создать функцию, которая переберет все возможные рукопожатия
+    и не будет зациклена на самой себе или иметь вид:
+    for (...)
+        for(...)
+            for(...)
+                ...
+    Вариант 1 - ограничить количество шагов в цикле количеством элементов в friends
+    Вариант 2 -
+
+     */
+}
 
 /**
  * Простая
@@ -189,14 +255,20 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
  *   subtractOf(a = mutableMapOf("a" to "z"), mapOf("a" to "z"))
  *     -> a changes to mutableMapOf() aka becomes empty
  */
-fun subtractOf(a: MutableMap<String, String>, b: Map<String, String>): Unit = TODO()
+fun subtractOf(a: MutableMap<String, String>, b: Map<String, String>): Unit {
+    for ((x, y) in b) if (a[x] == y) a.remove(x)
+}
 
 /**
  * Простая
  *
  * Для двух списков людей найти людей, встречающихся в обоих списках
  */
-fun whoAreInBoth(a: List<String>, b: List<String>): List<String> = TODO()
+fun whoAreInBoth(a: List<String>, b: List<String>): List<String> {
+    val sum = mutableListOf<String>()
+    for (x in a) if (x in b) sum.add(x)
+    return sum
+}
 
 /**
  * Средняя
@@ -207,7 +279,10 @@ fun whoAreInBoth(a: List<String>, b: List<String>): List<String> = TODO()
  * Например:
  *   canBuildFrom(listOf('a', 'b', 'o'), "baobab") -> true
  */
-fun canBuildFrom(chars: List<Char>, word: String): Boolean = TODO()
+fun canBuildFrom(chars: List<Char>, word: String): Boolean {
+    for (i in 0 until word.length) if (word[i] !in chars) return false
+    return true
+}
 
 /**
  * Средняя
@@ -221,7 +296,18 @@ fun canBuildFrom(chars: List<Char>, word: String): Boolean = TODO()
  * Например:
  *   extractRepeats(listOf("a", "b", "a")) -> mapOf("a" to 2)
  */
-fun extractRepeats(list: List<String>): Map<String, Int> = TODO()
+
+fun extractRepeats(list: List<String>): Map<String, Int> {
+    val sum = mutableMapOf<String, Int>()
+    val slv = mutableMapOf<String, Int>()
+    for (e in list) slv[e] = (slv[e] ?: 0) + 1
+    for ((s, i) in slv) if (i != 1) sum[s] = i
+    /*
+    Была мысль о том, чтобы использовать только один массив и просто удалить из него все элементы
+    со значением 1, но если ВСЕ элементы имели значение 1, программа выдавала ошибку.
+     */
+    return sum
+}
 
 /**
  * Средняя
@@ -232,7 +318,11 @@ fun extractRepeats(list: List<String>): Map<String, Int> = TODO()
  * Например:
  *   hasAnagrams(listOf("тор", "свет", "рот")) -> true
  */
-fun hasAnagrams(words: List<String>): Boolean = TODO()
+fun hasAnagrams(words: List<String>): Boolean {
+    for (i in 0 until words.size)
+        for (j in i + 1 until words.size) if (words[i] == words[j].reversed()) return true
+    return false
+}
 
 /**
  * Сложная

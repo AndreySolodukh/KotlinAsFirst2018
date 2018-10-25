@@ -112,20 +112,9 @@ fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<S
  *     -> mapOf(5 to listOf("Семён", "Михаил"), 3 to listOf("Марат"))
  */
 fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> {
-    val sum = mutableMapOf<Int, List<String>>()
-    val slv = mutableListOf<String>()
-    for (i in 2..5) {
-        for ((string, int) in grades) if (int == i) slv.add(string)
-        val slv2 = mutableListOf<String>()
-        for (j in slv) slv2.add(j)
-        if (slv2.isNotEmpty()) sum[i] = slv2
-        /*
-            if (slv.isNotEmpty()) sum[i] = slv
-        В sum[i] записывается ССЫЛКА на множество slv, >>> slv.clear() чистит результат.
-        Требуется доработка. - *доработано с помощью slv2.
-        */
-        slv.clear()
-    }
+    val sum = mutableMapOf<Int, MutableList<String>>()
+    for ((s, i) in grades) if (sum[i] == null) sum[i] = mutableListOf(s) else sum[i]!!.add(s)
+    for ((i) in sum) sum[i]!!.sort()
     return sum
 }
 
@@ -156,17 +145,14 @@ fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean {
  */
 fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Double> {
     val sum = mutableMapOf<String, Double>()
-    var count = 0
-    for ((string) in stockPrices) sum[string] = 0.0
-    for ((ss) in sum) {
-        for ((string, double) in stockPrices) if (ss == string) {
-            sum[ss] = sum[ss]!! + double
-            count++
-        }
-        sum[ss] = sum[ss]!! / count
-        count = 0
+    val slv = mutableMapOf<String, Int>()
+    for ((s, d) in stockPrices) {
+        sum[s] = (sum[s] ?: 0.0) + d
+        slv[s] = (slv[s] ?: 0) + 1
     }
+    for ((s) in sum) sum[s] = sum[s]!! / slv[s]!!
     return sum
+
 }
 
 /**
@@ -185,15 +171,15 @@ fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Doub
  *   ) -> "Мария"
  */
 fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): String? {
-    var sum = -1.0
-    var slv = ""
-    // Если написать slv: String, в return выходит ошибка "slv must be initialized"
-    for ((name, pair) in stuff)
+    var sum: Double = -1.0
+    var slv: String? = null
+    for ((name, pair) in stuff) {
         if (pair.first == kind && (sum > pair.second || sum == -1.0)) {
             sum = pair.second
             slv = name
         }
-    return if (sum != -1.0) slv else null
+    }
+    return slv
 }
 
 /**
@@ -232,11 +218,12 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
     Пока не очень понятно, как создать функцию, которая переберет все возможные рукопожатия
     и не будет зациклена на самой себе или иметь вид:
     for (...)
-        for(...)
-            for(...)
+        for (...)
+            for (...)
                 ...
     Вариант 1 - ограничить количество шагов в цикле количеством элементов в friends
-    Вариант 2 -
+    Вариант 2 - скопировать исходный массив в mutable и удалять из него ключи
+    Вариант 3 -
 
      */
 }
@@ -265,9 +252,9 @@ fun subtractOf(a: MutableMap<String, String>, b: Map<String, String>): Unit {
  * Для двух списков людей найти людей, встречающихся в обоих списках
  */
 fun whoAreInBoth(a: List<String>, b: List<String>): List<String> {
-    val sum = mutableListOf<String>()
+    val sum = mutableSetOf<String>()
     for (x in a) if (x in b) sum.add(x)
-    return sum
+    return sum.toList()
 }
 
 /**
@@ -280,8 +267,17 @@ fun whoAreInBoth(a: List<String>, b: List<String>): List<String> {
  *   canBuildFrom(listOf('a', 'b', 'o'), "baobab") -> true
  */
 fun canBuildFrom(chars: List<Char>, word: String): Boolean {
-    for (i in 0 until word.length) if (word[i] !in chars) return false
-    return true
+    val slv = mutableSetOf<Char>()
+    for (i in 0 until word.length) slv.add(word[i].toLowerCase())
+    return slv.union(lower(chars)).size == chars.size
+}
+
+// Ничего умнее для перевода списка в нижний регистр я не придумал.
+// Был вариант chars -> joinToString -> toLowerCase -> toList
+fun lower(input: List<Char>): List<Char> {
+    val sum = mutableListOf<Char>()
+    for (i in input) sum.add(i.toLowerCase())
+    return sum
 }
 
 /**
@@ -299,13 +295,8 @@ fun canBuildFrom(chars: List<Char>, word: String): Boolean {
 
 fun extractRepeats(list: List<String>): Map<String, Int> {
     val sum = mutableMapOf<String, Int>()
-    val slv = mutableMapOf<String, Int>()
-    for (e in list) slv[e] = (slv[e] ?: 0) + 1
-    for ((s, i) in slv) if (i != 1) sum[s] = i
-    /*
-    Была мысль о том, чтобы использовать только один массив и просто удалить из него все элементы
-    со значением 1, но если ВСЕ элементы имели значение 1, программа выдавала ошибку.
-     */
+    for (e in list) sum[e] = (sum[e] ?: 0) + 1
+    sum.values.removeIf { it == 1 }
     return sum
 }
 
@@ -320,8 +311,10 @@ fun extractRepeats(list: List<String>): Map<String, Int> {
  */
 fun hasAnagrams(words: List<String>): Boolean {
     for (i in 0 until words.size)
-        for (j in i + 1 until words.size) if (words[i] == words[j].reversed()) return true
+        for (j in i + 1 until words.size)
+            if (words[i].toList().sorted() == words[j].toList().sorted()) return true
     return false
+// Пока идей по повышению эффективности нет.
 }
 
 /**
@@ -341,7 +334,12 @@ fun hasAnagrams(words: List<String>): Boolean {
  *   findSumOfTwo(listOf(1, 2, 3), 4) -> Pair(0, 2)
  *   findSumOfTwo(listOf(1, 2, 3), 6) -> Pair(-1, -1)
  */
-fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> = TODO()
+fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
+    for (i in 0..number / 2)
+        if (i in list && number - i in list && i != number - i)
+            return list.indexOf(i) to list.indexOf(number - i)
+    return -1 to -1
+}
 
 /**
  * Очень сложная
@@ -362,4 +360,16 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> = TODO()
  *     450
  *   ) -> emptySet()
  */
-fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> = TODO()
+fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
+    val wert = mutableMapOf<String, Double>()
+    var inv = capacity
+    val sum = mutableSetOf<String>()
+    for ((s, pair) in treasures) wert[s] = (pair.second + 0.0) / pair.first
+    for (i in wert.size - 1 downTo 0) {
+        if (treasures[wert.toList().sortedBy { (_, v) -> v }[i].first]!!.first <= inv) {
+            inv -= treasures[wert.toList().sortedBy { (_, v) -> v }[i].first]!!.first
+            sum.add(wert.toList().sortedBy { (_, v) -> v }[i].first)
+        }
+    }
+    return sum
+}

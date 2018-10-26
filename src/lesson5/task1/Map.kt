@@ -207,25 +207,38 @@ fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): S
  *        )
  */
 fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<String>> {
-    val used = mutableSetOf<String>()
-    val sum = mutableMapOf<String, Set<String>>()
-    for ((a, b) in friends) {
-        used.add(a)
-        for (c in b) used.add(c)
+    val used = us(friends)
+    val sum = mutableMapOf<String, MutableSet<String>>()
+    for ((n, s) in friends) {
+        used.remove(n)
+        sum[n] = s.toMutableSet()
+        while (sum[n]!!.any { it in used })
+            TODO()
     }
-    TODO()
-    /*
-    Пока не очень понятно, как создать функцию, которая переберет все возможные рукопожатия
-    и не будет зациклена на самой себе или иметь вид:
+TODO()
+}
+
+/*
+Пока не очень понятно, как создать функцию, которая переберет все возможные рукопожатия
+и не будет зациклена на самой себе или иметь вид:
+for (...)
     for (...)
         for (...)
-            for (...)
-                ...
-    Вариант 1 - ограничить количество шагов в цикле количеством элементов в friends
-    Вариант 2 - скопировать исходный массив в mutable и удалять из него ключи
-    Вариант 3 -
+            ...
+Вариант 1 - ограничить количество шагов в цикле количеством элементов в friends
+Вариант 2 - скопировать исходный массив в mutable и удалять из него ключи
+Вариант 3 -
 
-     */
+ */
+
+
+fun us(a: Map<String, Set<String>>): MutableSet<String> {
+    val u = mutableSetOf<String>()
+    for ((a, b) in a) {
+        u.add(a)
+        for (c in b) u.add(c)
+    }
+    return u
 }
 
 /**
@@ -267,6 +280,7 @@ fun whoAreInBoth(a: List<String>, b: List<String>): List<String> {
  *   canBuildFrom(listOf('a', 'b', 'o'), "baobab") -> true
  */
 fun canBuildFrom(chars: List<Char>, word: String): Boolean {
+    if (word.isEmpty()) return true
     val slv = mutableSetOf<Char>()
     for (i in 0 until word.length) slv.add(word[i].toLowerCase())
     return slv.union(lower(chars)).size == chars.size
@@ -335,9 +349,15 @@ fun hasAnagrams(words: List<String>): Boolean {
  *   findSumOfTwo(listOf(1, 2, 3), 6) -> Pair(-1, -1)
  */
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
+    if ((number % 2 == 0) && (number / 2 in list)) {
+        val l = list.toMutableList()
+        val x = list.indexOf(number / 2)
+        l.removeAt(x)
+        if (number / 2 in l) return x to l.indexOf(number / 2)
+    }
     for (i in 0..number / 2)
         if (i in list && number - i in list && i != number - i)
-            return list.indexOf(i) to list.indexOf(number - i)
+            return minOf(list.indexOf(i), list.indexOf(number - i)) to maxOf(list.indexOf(i), list.indexOf(number - i))
     return -1 to -1
 }
 
@@ -366,10 +386,37 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
     val sum = mutableSetOf<String>()
     for ((s, pair) in treasures) wert[s] = (pair.second + 0.0) / pair.first
     for (i in wert.size - 1 downTo 0) {
+        var cost = 0
+        var cost2 = 0
+        var check = 0
+        if (i != 0)
+            if (treasures[wert.toList().sortedBy { (_, v) -> v }[i - 1].first]!!.first <= inv) {
+                var io = inv
+                for (j in i - 1 downTo 0) {
+                    val e = treasures[wert.toList().sortedBy { (_, v) -> v }[j].first]!!.first
+                    if (io - e >= 0) {
+                        io -= e
+                        cost += treasures[wert.toList().sortedBy { (_, v) -> v }[j].first]!!.second
+                    } else break
+                }
+            }
         if (treasures[wert.toList().sortedBy { (_, v) -> v }[i].first]!!.first <= inv) {
+            check++
+            var io = inv
+            for (j in i downTo 0) {
+                val e = treasures[wert.toList().sortedBy { (_, v) -> v }[j].first]!!.first
+                if (io - e >= 0) {
+                    io -= e
+                    cost2 += treasures[wert.toList().sortedBy { (_, v) -> v }[j].first]!!.second
+                } else break
+            }
+        }
+        println(cost2 to cost)
+        if (cost2 >= cost && check == 1) {
             inv -= treasures[wert.toList().sortedBy { (_, v) -> v }[i].first]!!.first
             sum.add(wert.toList().sortedBy { (_, v) -> v }[i].first)
         }
     }
     return sum
 }
+// Я т сам не до конца понимаю, как она работает. Если тесты не будут проходить - перепишу заново.

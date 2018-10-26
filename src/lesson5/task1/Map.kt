@@ -171,10 +171,10 @@ fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Doub
  *   ) -> "Мария"
  */
 fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): String? {
-    var sum: Double = -1.0
+    var sum: Double? = null
     var slv: String? = null
     for ((name, pair) in stuff) {
-        if (pair.first == kind && (sum > pair.second || sum == -1.0)) {
+        if (pair.first == kind && (sum == null || sum > pair.second)) {
             sum = pair.second
             slv = name
         }
@@ -213,7 +213,7 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
         used.add(a)
         for (c in b) used.add(c)
     }
-    return TODO()
+    TODO()
     /*
     Пока не очень понятно, как создать функцию, которая переберет все возможные рукопожатия
     и не будет зациклена на самой себе или иметь вид:

@@ -283,7 +283,7 @@ fun canBuildFrom(chars: List<Char>, word: String): Boolean {
     if (word.isEmpty()) return true
     val slv = mutableSetOf<Char>()
     for (i in 0 until word.length) slv.add(word[i].toLowerCase())
-    return slv.union(lower(chars)).size == chars.size
+    return slv.union(lower(chars)).size == chars.toSet().size
 }
 
 // Ничего умнее для перевода списка в нижний регистр я не придумал.
@@ -353,7 +353,7 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
         val l = list.toMutableList()
         val x = list.indexOf(number / 2)
         l.removeAt(x)
-        if (number / 2 in l) return x to l.indexOf(number / 2)
+        if (number / 2 in l) return x to l.indexOf(number / 2) + 1
     }
     for (i in 0..number / 2)
         if (i in list && number - i in list && i != number - i)

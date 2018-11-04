@@ -232,9 +232,9 @@ for (...)
  */
 
 
-fun us(a: Map<String, Set<String>>): MutableSet<String> {
+fun us(x: Map<String, Set<String>>): MutableSet<String> {
     val u = mutableSetOf<String>()
-    for ((a, b) in a) {
+    for ((a, b) in x) {
         u.add(a)
         for (c in b) u.add(c)
     }
@@ -284,16 +284,9 @@ fun canBuildFrom(chars: List<Char>, word: String): Boolean {
     if (word.isEmpty()) return true
     val slv = mutableSetOf<Char>()
     for (i in 0 until word.length) slv.add(word[i].toLowerCase())
-    return slv.union(lower(chars)).size == chars.toSet().size
+    return slv.union(chars.toString().toLowerCase().toSet()).size == chars.toSet().size
 }
 
-// Ничего умнее для перевода списка в нижний регистр я не придумал.
-// Был вариант chars -> joinToString -> toLowerCase -> toList
-fun lower(input: List<Char>): List<Char> {
-    val sum = mutableListOf<Char>()
-    for (i in input) sum.add(i.toLowerCase())
-    return sum
-}
 
 /**
  * Средняя
@@ -331,6 +324,7 @@ fun hasAnagrams(words: List<String>): Boolean {
     return false
 // Пока идей по повышению эффективности нет.
 }
+
 
 /**
  * Сложная

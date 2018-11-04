@@ -256,7 +256,8 @@ fun us(a: Map<String, Set<String>>): MutableSet<String> {
  *     -> a changes to mutableMapOf() aka becomes empty
  */
 fun subtractOf(a: MutableMap<String, String>, b: Map<String, String>): Unit {
-    for ((x, y) in b) if (a[x] == y) a.remove(x)
+    for ((x, y) in b)
+        if (a[x] == y) a.remove(x)
 }
 
 /**

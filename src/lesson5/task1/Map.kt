@@ -424,15 +424,22 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
                     v += treasures[wert.toList().sortedBy { (_, v) -> v }[j].first]!!.second
                     sum2.add(wert.toList().sortedBy { (_, v) -> v }[j].first)
                 }
-                if (j == 0 && v <= treasures[wert.toList().sortedBy { (_, v) -> v }[i].first]!!.second) { // "<=" ???
+                if (j == 0 && v <= treasures[wert.toList().sortedBy { (_, v) -> v }[i].first]!!.second &&
+                        wert.toList().sortedBy { (_, v) -> v }[i].first !in used) {
                     sum.add(wert.toList().sortedBy { (_, v) -> v }[i].first)
                     used.add(wert.toList().sortedBy { (_, v) -> v }[i].first)
                     inv -= treasures[wert.toList().sortedBy { (_, v) -> v }[i].first]!!.first
-                } else {
-                    sum.addAll(sum2)
-                    used.addAll(sum2)
-                    inv -= weight
-                }
+                } else
+                    if (wert.toList().sortedBy { (_, v) -> v }[i].first !in used) {
+                        sum.addAll(sum2)
+                        used.addAll(sum2)
+                        inv -= weight
+                    } else {
+                        sum.remove(wert.toList().sortedBy { (_, v) -> v }[i].first)
+                        sum.addAll(sum2)
+                        used.addAll(sum2)
+                        inv -= weight
+                    }
             }
         }
         if (i == 0 && treasures[wert.toList().sortedBy { (_, v) -> v }[i].first]!!.first <= inv)

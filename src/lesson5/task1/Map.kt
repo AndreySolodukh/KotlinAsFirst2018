@@ -438,7 +438,7 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
                         sum.remove(wert.toList().sortedBy { (_, v) -> v }[i].first)
                         sum.addAll(sum2)
                         used.addAll(sum2)
-                        inv -= weight
+                        inv = inv + treasures[wert.toList().sortedBy { (_, v) -> v }[i].first]!!.first - weight
                     }
             }
         }

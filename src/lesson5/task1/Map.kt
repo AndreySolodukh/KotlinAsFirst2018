@@ -409,6 +409,7 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
     val wert = mutableMapOf<String, Double>()
     var inv = capacity
     val sum = mutableSetOf<String>()
+    val used = mutableSetOf<String>()
     for ((s, pair) in treasures) wert[s] = (pair.second + 0.0) / pair.first
     for (i in wert.size - 1 downTo 0) {
         if (i > 0 && treasures[wert.toList().sortedBy { (_, v) -> v }[i].first]!!.first <= inv) {
@@ -417,15 +418,21 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
             val sum2 = mutableSetOf<String>()
             for (j in i - 1 downTo 0) {
                 if (treasures[wert.toList().sortedBy { (_, v) -> v }[j].first]!!.first + weight <=
-                        treasures[wert.toList().sortedBy { (_, v) -> v }[i].first]!!.first) {
+                        treasures[wert.toList().sortedBy { (_, v) -> v }[i].first]!!.first &&
+                        wert.toList().sortedBy { (_, v) -> v }[i].first !in used) {
                     weight += treasures[wert.toList().sortedBy { (_, v) -> v }[j].first]!!.first
                     v += treasures[wert.toList().sortedBy { (_, v) -> v }[j].first]!!.second
                     sum2.add(wert.toList().sortedBy { (_, v) -> v }[j].first)
                 }
                 if (j == 0 && v <= treasures[wert.toList().sortedBy { (_, v) -> v }[i].first]!!.second) { // "<=" ???
                     sum.add(wert.toList().sortedBy { (_, v) -> v }[i].first)
+                    used.add(wert.toList().sortedBy { (_, v) -> v }[i].first)
                     inv -= treasures[wert.toList().sortedBy { (_, v) -> v }[i].first]!!.first
-                } else sum.addAll(sum2)
+                } else {
+                    sum.addAll(sum2)
+                    used.addAll(sum2)
+                    inv -= weight
+                }
             }
         }
         if (i == 0 && treasures[wert.toList().sortedBy { (_, v) -> v }[i].first]!!.first <= inv)

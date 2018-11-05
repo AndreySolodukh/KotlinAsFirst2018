@@ -411,7 +411,7 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
     val used = mutableSetOf<String>()
     for ((a, _) in treasures) used.add(a)
     for ((s, pair) in treasures) wert[s] = (pair.second + 0.0) / pair.first
-    var check = min(treasures, used)
+    var check = min(treasures, used, inv)
     println(check)
     while (check <= inv) {
         for (i in wert.size - 1 downTo 0) {
@@ -456,14 +456,15 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
                 inv -= treasures[wert.toList().sortedBy { (_, v) -> v }[i].first]!!.first
             }
         }
-        check = min(treasures, used)
+        check = min(treasures, used, inv)
         println(inv)
         println(check)
     }
     return sum.toList().sortedBy { v -> v }.toSet()
 }
 
-fun min(a: Map<String, Pair<Int, Int>>, b: MutableSet<String>): Int {
+fun min(a: Map<String, Pair<Int, Int>>, b: MutableSet<String>, c: Int): Int {
+    if (b.isEmpty()) return c + 1
     var sum = a.toList().first().second.first
     for (x in b) sum = minOf(a[x]!!.first, sum)
     return sum

@@ -241,6 +241,8 @@ fun us(x: Map<String, Set<String>>): MutableSet<String> {
     return u
 }
 
+
+
 /**
  * Простая
  *
@@ -390,7 +392,7 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
                     weight += treasures[wert.toList().sortedBy { (_, v) -> v }[j].first]!!.first
                     v += treasures[wert.toList().sortedBy { (_, v) -> v }[j].first]!!.second
                 }
-                if (j == 0 && v < treasures[wert.toList().sortedBy { (_, v) -> v }[i].first]!!.second) { // "<=" ???
+                if (j == 0 && v <= treasures[wert.toList().sortedBy { (_, v) -> v }[i].first]!!.second) { // "<=" ???
                     sum.add(wert.toList().sortedBy { (_, v) -> v }[i].first)
                     inv -= treasures[wert.toList().sortedBy { (_, v) -> v }[i].first]!!.first
                 }
@@ -400,46 +402,3 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
     }
     return sum
 }
-
-
-/*
-fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
-    val wert = mutableMapOf<String, Double>()
-    var inv = capacity
-    val sum = mutableSetOf<String>()
-    for ((s, pair) in treasures) wert[s] = (pair.second + 0.0) / pair.first
-    for (i in wert.size - 1 downTo 0) {
-        var cost = 0
-        var cost2 = 0
-        var check = 0
-        if (i != 0)
-            if (treasures[wert.toList().sortedBy { (_, v) -> v }[i - 1].first]!!.first <= inv) {
-                var io = inv
-                for (j in i - 1 downTo 0) {
-                    val e = treasures[wert.toList().sortedBy { (_, v) -> v }[j].first]!!.first
-                    if (io - e >= 0) {
-                        io -= e
-                        cost += treasures[wert.toList().sortedBy { (_, v) -> v }[j].first]!!.second
-                    } else break
-                }
-            }
-        if (treasures[wert.toList().sortedBy { (_, v) -> v }[i].first]!!.first <= inv) {
-            check++
-            var io = inv
-            for (j in i downTo 0) {
-                val e = treasures[wert.toList().sortedBy { (_, v) -> v }[j].first]!!.first
-                if (io - e >= 0) {
-                    io -= e
-                    cost2 += treasures[wert.toList().sortedBy { (_, v) -> v }[j].first]!!.second
-                } else break
-            }
-        }
-        println(cost2 to cost)
-        if (cost2 >= cost && check == 1) {
-            inv -= treasures[wert.toList().sortedBy { (_, v) -> v }[i].first]!!.first
-            sum.add(wert.toList().sortedBy { (_, v) -> v }[i].first)
-        }
-    }
-    return sum
-}
- Я т сам не до конца понимаю, как она работает. Если тесты не будут проходить - перепишу заново. */

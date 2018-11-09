@@ -98,7 +98,7 @@ fun dateStrToDigit(str: String): String {
         month == 0 -> ""
         day > daysInMonth(month, year) -> ""
         year < 0 -> "" // Надеюсь, расчет ведется для нашей эры.
-        else -> String.format("%02d.%02d.%04d", day, month, year)
+        else -> String.format("%02d.%02d.%d", day, month, year)
     }
 }
 
@@ -124,6 +124,7 @@ fun dateDigitToStr(digital: String): String {
         day = parts[0].toInt()
         month = months[parts[1].toInt() - 1]
         year = parts[2].toInt()
+        println("$day, $month, $year")
     } catch (e: IndexOutOfBoundsException) {
         return ""
     } catch (e: NumberFormatException) {
@@ -156,7 +157,7 @@ fun flattenPhoneNumber(phone: String): String {
     } catch (e: NumberFormatException) {
         return ""
     }
-    return ph
+    return if (ph.isEmpty()) return "" else ph
 }
 
 /**
@@ -171,7 +172,7 @@ fun flattenPhoneNumber(phone: String): String {
  */
 fun bestLongJump(jumps: String): Int {
     val parts = jumps.split(" ")
-    var sum = -1
+    var sum: Int = -1
     try {
         for (p in parts)
             if (p != "-" && p != "%")
@@ -180,7 +181,7 @@ fun bestLongJump(jumps: String): Int {
         return -1
     }
     return sum
-}
+} // Как на сервере могут появляться тесты с огромными числами, если нужно вывести Int?
 
 /**
  * Сложная
@@ -220,6 +221,7 @@ fun bestHighJump(jumps: String): Int {
  * Про нарушении формата входной строки бросить исключение IllegalArgumentException
  */
 fun plusMinus(expression: String): Int {
+    if (expression.isEmpty()) throw IllegalArgumentException()
     val parts = expression.split(" ")
     var sum: Int
     try {
@@ -300,11 +302,17 @@ fun mostExpensive(description: String): String {
  * Вернуть -1, если roman не является корректным римским числом
  */
 fun fromRoman(roman: String): Int {
+    var ramen = roman
     var i = 1
-    while (roman(i) != roman && i < 3001) i += 1
+    var ths = 0
+    while (ramen[0] == 'M' && ramen.length > 1) {
+        ths++
+        ramen = ramen.substring(1, ramen.length)
+    }
+    while (roman(i) != ramen && i < 3001) i += 1
     if (i == 3001) i = -1
-    return i
-} // Разумеется, программа будет переписана. Но идея была неплохой.
+    return ths * 1000 + i
+}
 
 /**
  * Очень сложная

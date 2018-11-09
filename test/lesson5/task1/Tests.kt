@@ -141,11 +141,11 @@ class Tests {
         )
         // TODO:  Sort the values here or let the students do it?
         assertEquals(
-                mapOf(5 to listOf("Семён", "Михаил").sorted(), 3 to listOf("Марат")).toSortedMap(),
+                mapOf(5 to listOf("Семён", "Михаил"), 3 to listOf("Марат")),
                 buildGrades(mapOf("Марат" to 3, "Семён" to 5, "Михаил" to 5))
         )
         assertEquals(
-                mapOf(3 to listOf("Семён", "Михаил", "Марат").sorted()),
+                mapOf(3 to listOf("Марат", "Семён", "Михаил")),
                 buildGrades(mapOf("Марат" to 3, "Семён" to 3, "Михаил" to 3))
         )
     }
@@ -327,7 +327,25 @@ class Tests {
                         450
                 )
         )
+        assertEquals(
+                setOf("35", "34", "33", "32", "31", "30", "29", "28", "27", "26", "25", "24", "23", "22", "21", "20",
+                        "19", "18", "17", "16", "15", "14", "13", "12", "11", "10", "9", "8", "7", "6", "5", "4", "3",
+                        "2", "1").toList().sortedBy { v -> v }.toSet(),
+                bagPacking(
+                        mapOf("0" to (386 to 1), "1" to (166 to 335), "2" to (165 to 2), "3" to (390 to 307),
+                                "4" to (236 to 148), "5" to (354 to 416), "6" to (2 to 331), "7" to (208 to 149),
+                                "8" to (48 to 341), "9" to (1 to 1), "10" to (8 to 33), "11" to (2 to 148),
+                                "12" to (1 to 106), "13" to (2 to 148), "14" to (1 to 251),
+                                "15" to (33 to 2), "16" to (1 to 2), "17" to (2 to 149), "18" to (2 to 496),
+                                "19" to (88 to 149), "20" to (148 to 2), "21" to (342 to 2), "22" to (19 to 149),
+                                "23" to (148 to 298), "24" to (1 to 2), "25" to (1 to 121), "26" to (1 to 26),
+                                "27" to (3 to 193), "28" to (1 to 2), "29" to (1 to 290), "30" to (2 to 149),
+                                "31" to (1 to 2), "32" to (29 to 451), "33" to (149 to 179), "34" to (406 to 236),
+                                "35" to (281 to 370)),
+                        3283
+                )
+        )
     }
 
-    // TODO: map task tests
+// TODO: map task tests
 }

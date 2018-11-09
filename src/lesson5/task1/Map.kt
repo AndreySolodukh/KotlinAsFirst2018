@@ -114,7 +114,6 @@ fun mergePhoneBooks(mapA: Map<String, String>, mapB: Map<String, String>): Map<S
 fun buildGrades(grades: Map<String, Int>): Map<Int, List<String>> {
     val sum = mutableMapOf<Int, MutableList<String>>()
     for ((s, i) in grades) if (sum[i] == null) sum[i] = mutableListOf(s) else sum[i]!!.add(s)
-    for ((i) in sum) sum[i]!!.sort()
     return sum
 }
 
@@ -208,29 +207,16 @@ fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): S
  */
 fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<String>> {
     val used = us(friends)
-    val sum = mutableMapOf<String, MutableSet<String>>()
-    for ((n, s) in friends) {
-        used.remove(n)
-        sum[n] = s.toMutableSet()
-        while (sum[n]!!.any { it in used })
-            TODO()
+    val sum = friends.toMutableMap()
+    for ((a, b) in friends)
+        for ((c, d) in sum)
+            if (a in d) sum[c] = sum[c]!!.union(b)
+    for (u in used) {
+        if (sum[u] != null) sum[u] = sum[u]!! - u // почему компилятор требует !! даже после проверки?
+        else sum[u] = setOf()
     }
-    TODO()
+    return sum
 }
-
-/*
-Пока не очень понятно, как создать функцию, которая переберет все возможные рукопожатия
-и не будет зациклена на самой себе или иметь вид:
-for (...)
-    for (...)
-        for (...)
-            ...
-Вариант 1 - ограничить количество шагов в цикле количеством элементов в friends
-Вариант 2 - скопировать исходный массив в mutable и удалять из него ключи
-Вариант 3 -
-
- */
-
 
 fun us(x: Map<String, Set<String>>): MutableSet<String> {
     val u = mutableSetOf<String>()
@@ -319,13 +305,10 @@ fun extractRepeats(list: List<String>): Map<String, Int> {
  *   hasAnagrams(listOf("тор", "свет", "рот")) -> true
  */
 fun hasAnagrams(words: List<String>): Boolean {
-    for (i in 0 until words.size)
-        for (j in i + 1 until words.size)
-            if (words[i].toList().sorted() == words[j].toList().sorted()) return true
-    return false
-// Пока идей по повышению эффективности нет.
+    val sum = mutableSetOf<Set<Char>>()
+    for (elem in words) sum.add(elem.toLowerCase().toSet())
+    return (sum.size != words.size)
 }
-
 
 /**
  * Сложная
@@ -345,15 +328,18 @@ fun hasAnagrams(words: List<String>): Boolean {
  *   findSumOfTwo(listOf(1, 2, 3), 6) -> Pair(-1, -1)
  */
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
+
     if ((number % 2 == 0) && (number / 2 in list)) {
         val l = list.toMutableList()
         val x = list.indexOf(number / 2)
         l.removeAt(x)
         if (number / 2 in l) return x to l.indexOf(number / 2) + 1
     }
+    val map = mutableMapOf<Int, Int>()
+    for (i in list.size - 1 downTo 0) map[list[i]] = i
     for (i in 0..number / 2)
         if (i in list && number - i in list && i != number - i)
-            return minOf(list.indexOf(i), list.indexOf(number - i)) to maxOf(list.indexOf(i), list.indexOf(number - i))
+            return map[i]!! to map[number - i]!!
     return -1 to -1
 }
 
@@ -457,8 +443,6 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
             }
         }
         check = min(treasures, used, inv)
-        println(inv)
-        println(check)
     }
     return sum.toList().sortedBy { v -> v }.toSet()
 }

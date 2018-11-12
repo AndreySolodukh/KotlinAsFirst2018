@@ -124,7 +124,6 @@ fun dateDigitToStr(digital: String): String {
         day = parts[0].toInt()
         month = months[parts[1].toInt() - 1]
         year = parts[2].toInt()
-        println("$day, $month, $year")
     } catch (e: IndexOutOfBoundsException) {
         return ""
     } catch (e: NumberFormatException) {
@@ -224,11 +223,11 @@ fun plusMinus(expression: String): Int {
     if (expression.isEmpty()) throw IllegalArgumentException()
     val parts = expression.split(" ")
     var sum: Int
+    if (parts[0].first() !in '0'..'9') throw IllegalArgumentException()
     try {
-        if (parts[0].first().toString() !in "0".."9") throw IllegalArgumentException()
         sum = parts[0].toInt()
         for (i in 1 until parts.size - 1 step 2) {
-            if (parts[i + 1].first().toString() !in "0".."9") throw IllegalArgumentException()
+            if (parts[i + 1].first() !in '0'..'9') throw IllegalArgumentException()
             when {
                 parts[i] == "+" -> sum += parts[i + 1].toInt()
                 parts[i] == "-" -> sum -= parts[i + 1].toInt()
@@ -302,6 +301,7 @@ fun mostExpensive(description: String): String {
  * Вернуть -1, если roman не является корректным римским числом
  */
 fun fromRoman(roman: String): Int {
+    if (roman.isEmpty()) return -1
     var ramen = roman
     var i = 1
     var ths = 0

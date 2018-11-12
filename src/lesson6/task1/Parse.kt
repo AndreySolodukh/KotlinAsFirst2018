@@ -131,7 +131,7 @@ fun dateDigitToStr(digital: String): String {
         return ""
     }
     return when {
-        day > daysInMonth(months.indexOf(month), year) -> ""
+        day > daysInMonth(months.indexOf(month) + 1, year) -> ""
         year < 0 -> ""
         else -> String.format("%d %s %d", day, month, year)
     }
@@ -202,9 +202,7 @@ fun bestHighJump(jumps: String): Int {
             println(parts[i - 1])
             if ("+" in parts[i] && sum < parts[i - 1].toInt()) sum = parts[i - 1].toInt()
         }
-        /* Проверка формата вводимой строки - если будет необходимость.
         val s = jumps.replace(" ", "").replace("%", "").replace("+", "").replace("-", "").toLong()
-        */
     } catch (e: NumberFormatException) {
         return -1
     }
@@ -228,7 +226,7 @@ fun plusMinus(expression: String): Int {
         if (parts[0].first() !in '0'..'9') throw IllegalArgumentException()
         sum = parts[0].toInt()
         for (i in 1 until parts.size - 1 step 2) {
-            // if (parts[i + 1].first() !in '0'..'9') throw IllegalArgumentException()
+            if (parts[i + 1].first() !in '0'..'9') throw IllegalArgumentException()
             when {
                 parts[i] == "+" -> sum += parts[i + 1].toInt()
                 parts[i] == "-" -> sum -= parts[i + 1].toInt()

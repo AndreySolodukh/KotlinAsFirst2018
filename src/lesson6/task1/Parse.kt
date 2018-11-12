@@ -156,6 +156,8 @@ fun flattenPhoneNumber(phone: String): String {
         else ph.toLong()
     } catch (e: NumberFormatException) {
         return ""
+    } catch (e: NoSuchElementException) {
+        return ""
     }
     return if (ph.isEmpty()) return "" else ph
 }

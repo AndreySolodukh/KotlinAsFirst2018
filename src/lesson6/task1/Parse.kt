@@ -227,7 +227,7 @@ fun plusMinus(expression: String): Int {
     try {
         sum = parts[0].toInt()
         for (i in 1 until parts.size - 1 step 2) {
-            if (parts[i + 1].first() !in '0'..'9') throw IllegalArgumentException()
+            // if (parts[i + 1].first() !in '0'..'9') throw IllegalArgumentException()
             when {
                 parts[i] == "+" -> sum += parts[i + 1].toInt()
                 parts[i] == "-" -> sum -= parts[i + 1].toInt()
@@ -301,8 +301,8 @@ fun mostExpensive(description: String): String {
  * Вернуть -1, если roman не является корректным римским числом
  */
 fun fromRoman(roman: String): Int {
-    if (roman.isEmpty()) return -1
     var ramen = roman
+    if (roman.isEmpty()) return -1
     var i = 1
     var ths = 0
     while (ramen[0] == 'M' && ramen.length > 1) {
@@ -311,7 +311,7 @@ fun fromRoman(roman: String): Int {
     }
     while (roman(i) != ramen && i < 3001) i += 1
     if (i == 3001) i = -1
-    return ths * 1000 + i
+    return if (i != -1) ths * 1000 + i else -1
 }
 
 /**

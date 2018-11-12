@@ -143,15 +143,12 @@ fun containsIn(a: Map<String, String>, b: Map<String, String>): Boolean {
  *     -> mapOf("MSFT" to 150.0, "NFLX" to 40.0)
  */
 fun averageStockPrice(stockPrices: List<Pair<String, Double>>): Map<String, Double> {
+    val slv = mutableMapOf<String, Pair<Double, Int>>()
     val sum = mutableMapOf<String, Double>()
-    val slv = mutableMapOf<String, Int>()
-    for ((s, d) in stockPrices) {
-        sum[s] = (sum[s] ?: 0.0) + d
-        slv[s] = (slv[s] ?: 0) + 1
-    }
-    for ((s) in sum) sum[s] = sum[s]!! / slv[s]!!
+    for ((s, _) in stockPrices) slv[s] = 0.0 to 0
+    for ((s, d) in stockPrices) slv[s] = slv[s]!!.first + d to slv[s]!!.second + 1
+    for ((s, d) in slv) sum[s] = d.first / d.second
     return sum
-
 }
 
 /**

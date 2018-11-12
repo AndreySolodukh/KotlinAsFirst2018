@@ -5,6 +5,7 @@ package lesson6.task1
 import lesson4.task1.roman
 import lesson2.task2.daysInMonth
 import java.util.*
+import kotlin.NoSuchElementException
 
 fun remover(str: String, list: List<String>): String {
     var sum = str
@@ -223,8 +224,8 @@ fun plusMinus(expression: String): Int {
     if (expression.isEmpty()) throw IllegalArgumentException()
     val parts = expression.split(" ")
     var sum: Int
-    if (parts[0].first() !in '0'..'9') throw IllegalArgumentException()
     try {
+        if (parts[0].first() !in '0'..'9') throw IllegalArgumentException()
         sum = parts[0].toInt()
         for (i in 1 until parts.size - 1 step 2) {
             // if (parts[i + 1].first() !in '0'..'9') throw IllegalArgumentException()
@@ -235,6 +236,8 @@ fun plusMinus(expression: String): Int {
             }
         }
     } catch (e: NumberFormatException) {
+        throw IllegalArgumentException()
+    } catch (e: NoSuchElementException) {
         throw IllegalArgumentException()
     }
     return sum

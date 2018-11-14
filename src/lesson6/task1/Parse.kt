@@ -83,20 +83,19 @@ fun main(args: Array<String>) {
 fun dateStrToDigit(str: String): String {
     val parts = str.split(" ")
     if (parts.size != 3) return "" // Помогает избежать написания дополнительного catch (IndexOutOfBounds)
-    val months = listOf("января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября",
-            "октября", "ноября", "декабря")
+    val months = mapOf("января" to 1, "февраля" to 2, "марта" to 3, "апреля" to 4, "мая" to 5, "июня" to 6,
+            "июля" to 7, "августа" to 8, "сентября" to 9, "октября" to 10, "ноября" to 11, "декабря" to 12)
     val day: Int
     val month: Int
     val year: Int
     try {
         day = parts[0].toInt()
-        month = months.indexOf(parts[1]) + 1
+        month = months[parts[1]] ?: return ""
         year = parts[2].toInt()
     } catch (e: NumberFormatException) {
         return ""
     }
     return when {
-        month == 0 -> ""
         day > daysInMonth(month, year) -> ""
         year < 0 -> "" // Надеюсь, расчет ведется для нашей эры.
         else -> String.format("%02d.%02d.%d", day, month, year)
@@ -116,22 +115,20 @@ fun dateStrToDigit(str: String): String {
 fun dateDigitToStr(digital: String): String {
     val parts = digital.split(".")
     if (parts.size != 3) return ""
-    val months = listOf("января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября",
-            "октября", "ноября", "декабря")
+    val months = mapOf(1 to "января", 2 to "февраля", 3 to "марта", 4 to "апреля", 5 to "мая", 6 to "июня",
+            7 to "июля", 8 to "августа", 9 to "сентября", 10 to "октября", 11 to "ноября", 12 to "декабря")
     val day: Int
     val month: String
     val year: Int
     try {
         day = parts[0].toInt()
-        month = months[parts[1].toInt() - 1]
+        month = months[parts[1].toInt()] ?: return ""
         year = parts[2].toInt()
-    } catch (e: IndexOutOfBoundsException) {
-        return ""
     } catch (e: NumberFormatException) {
         return ""
     }
     return when {
-        day > daysInMonth(months.indexOf(month) + 1, year) -> ""
+        day > daysInMonth(parts[1].toInt(), year) -> ""
         year < 0 -> ""
         else -> String.format("%d %s %d", day, month, year)
     }
@@ -150,16 +147,21 @@ fun dateDigitToStr(digital: String): String {
  * При неверном формате вернуть пустую строку
  */
 fun flattenPhoneNumber(phone: String): String {
-    val ph = remover(phone, listOf("(", ")", " ", "-"))
-    try {
-        val check = if (ph.first().toString() == "+") ph.substring(1, ph.length).toLong()
-        else ph.toLong()
-    } catch (e: NumberFormatException) {
-        return ""
-    } catch (e: NoSuchElementException) {
-        return ""
+    val ph = remover(phone, listOf(" ", "-"))
+    var check = 2
+    for (i in 0 until ph.length) {
+        if (i == 0 && ph[i] == '+') continue
+        if (ph[i] == '(' && check == 2) {
+            check--
+            continue
+        }
+        if (ph[i] == ')' && check == 1) {
+            check--
+            continue
+        }
+        if (ph[i] !in '0'..'9') return ""
     }
-    return if (ph.isEmpty()) return "" else ph
+    return if (ph.isEmpty()) "" else remover(ph, listOf("(", ")"))
 }
 
 /**
@@ -174,16 +176,17 @@ fun flattenPhoneNumber(phone: String): String {
  */
 fun bestLongJump(jumps: String): Int {
     val parts = jumps.split(" ")
-    var sum: Int = -1
+    println(parts)
+    var sum = -1
     try {
         for (p in parts)
-            if (p != "-" && p != "%")
+            if (p != "" && p != "-" && p != "%")
                 if (sum < p.toInt()) sum = p.toInt()
     } catch (e: NumberFormatException) {
         return -1
     }
     return sum
-} // Как на сервере могут появляться тесты с огромными числами, если нужно вывести Int?
+}
 
 /**
  * Сложная
@@ -200,11 +203,10 @@ fun bestHighJump(jumps: String): Int {
     var sum = -1
     try {
         for (i in 1 until parts.size step 2) {
-            println(parts[i])
-            println(parts[i - 1])
             if ("+" in parts[i] && sum < parts[i - 1].toInt()) sum = parts[i - 1].toInt()
         }
-        val s = jumps.replace(" ", "").replace("%", "").replace("+", "").replace("-", "").toLong()
+        val s = jumps.replace(" ", "").replace("%", "").replace("+", "").replace("-", "")
+        if (s.any { it !in '0'..'9' }) return -1
     } catch (e: NumberFormatException) {
         return -1
     }
@@ -227,6 +229,7 @@ fun plusMinus(expression: String): Int {
     try {
         if (parts[0].first() !in '0'..'9') throw IllegalArgumentException()
         sum = parts[0].toInt()
+        if (parts.size % 2 != 1) throw IllegalArgumentException()
         for (i in 1 until parts.size - 1 step 2) {
             if (parts[i + 1].first() !in '0'..'9') throw IllegalArgumentException()
             when {
@@ -304,17 +307,83 @@ fun mostExpensive(description: String): String {
  * Вернуть -1, если roman не является корректным римским числом
  */
 fun fromRoman(roman: String): Int {
-    var ramen = roman
+    if (roman.isEmpty()) return -1
+    var sum = 0
+    var ro = roman
+    val num = mapOf(2 to "MDC", 1 to "CLX", 0 to "XVI")
+    while (ro[0] == 'M') {
+        sum += 1000
+        ro = ro.substring(1, ro.lastIndex)
+    }
+    println(ro[0])
+    for (i in 2 downTo 0) {
+        if (ro.isNotEmpty())
+            while (ro[0] == num[i]!![2] || ro[0] == num[i]!![1]) {
+                /* Я не знаю, что на этом моменте требует от меня программа. Где и как бы я не проверял строку на наличие
+                символов, все вылеты происходят именно в этой строке и именно по причине:
+                "java.lang.StringIndexOutOfBoundsException",
+                хотя нулевой символ в строке есть.
+                 */
+                when {
+                    ro.length == 1 -> {
+                        sum += if (ro[0] == num[i]!![2])
+                            Math.pow(10.0, i + 0.0).toInt()
+                        else 5 * Math.pow(10.0, i + 0.0).toInt()
+                        ro = ""
+                    }
+                    ro[0] == num[i]!![2] && ro[1] == num[i]!![0] && sum % Math.pow(10.0, i + 1.0) == 0.0 -> {
+                        sum += 9 * Math.pow(10.0, i + 0.0).toInt()
+                        ro = ro.substring(2, ro.lastIndex)
+                    }
+                    ro[0] == num[i]!![2] && ro[1] == num[i]!![1] && sum % 1000 == 0 -> {
+                        sum += 4 * Math.pow(10.0, i + 0.0).toInt()
+                        ro = ro.substring(2, ro.lastIndex)
+                    }
+                    ro[0] == num[i]!![1] && sum % 1000 == 0 -> {
+                        sum += 5 * Math.pow(10.0, i + 0.0).toInt()
+                        ro = ro.substring(1, ro.lastIndex)
+                    }
+                    ro[0] == num[i]!![2] -> {
+                        var c = 0
+                        while (ro[0] == num[i]!![2]) {
+                            c++
+                            if (c == 4) return -1
+                            sum += Math.pow(10.0, i + 0.0).toInt()
+                            ro = ro.substring(1, ro.lastIndex)
+                        }
+                    }
+                    else -> return -1
+                }
+            }
+    }
+    return if (ro.isEmpty()) sum else -1
+    /*
+    *M* - удалять по символу и прибавлять по 1000 +++
+    *CM* - удалить и добавить 900                 \
+    *D* - удалить и добавить 500                   \
+    *CD* - удалить и добавить 400                  /
+    *C* - удалять по символу и добавлять по 100   /
+    *XC*  - удалить и добавить 90                \
+    *L* - удалить и добавить 50                   \
+    *XL* - удалить и добавить 40                  /
+    *X* - удалять по символу и добавлять по 10   /
+    *IX* - удалить и добавить 9                 \
+    *V* - удалить и добавить 5                   \
+    *IV* - удалить и добавить 4                  /
+    *I* - удалять по символу и добавлять по 1   /
+
+    var rom = roman
     if (roman.isEmpty()) return -1
     var i = 1
     var ths = 0
-    while (ramen[0] == 'M' && ramen.length > 1) {
+    while (rom[0] == 'M' && rom.length > 1) {
         ths++
-        ramen = ramen.substring(1, ramen.length)
+        rom = rom.substring(1, rom.length)
     }
-    while (roman(i) != ramen && i < 3001) i += 1
+    while (roman(i) != rom && i < 3001) i++
     if (i == 3001) i = -1
     return if (i != -1) ths * 1000 + i else -1
+    */
 }
 
 /**

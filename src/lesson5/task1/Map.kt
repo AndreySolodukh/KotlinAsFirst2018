@@ -379,7 +379,7 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
     // будет использоваться только для сортировки => возможно, будет доработка.
     // ^^Пункт 2^^
     val use = mutableListOf<String>() // Нужен именно list.
-    for (i in 0 until zhi.size) use.add(i, zhi.toList().sortedBy { (_, v) -> v }[i].first) // Вот бы ещё сработало...
+    for (i in 0 until zhi.size) use.add(i, zhi.toList().sortedBy { (_, v) -> v }[i].first)
     // ^^Пункты 3 и 4^^
     var minweight = treasures[use[0]]!!.first
     for (i in 1 until use.size) minweight = minOf(minweight, treasures[use[i]]!!.first)
@@ -412,3 +412,4 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
     // ^^Пункт 5^^
     return sum
 }
+/**\ ~ Running out of ideas... ~ \**/

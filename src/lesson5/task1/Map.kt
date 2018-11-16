@@ -379,30 +379,31 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
     // будет использоваться только для сортировки => возможно, будет доработка.
     // ^^Пункт 2^^
     val use = mutableListOf<String>() // Нужен именно list.
-    for (i in 0 until zhi.size) use[i] = zhi.toList().sortedBy { (_, v) -> v }[i].first // Вот бы ещё сработало...
+    for (i in 0 until zhi.size) use.add(i, zhi.toList().sortedBy { (_, v) -> v }[i].first) // Вот бы ещё сработало...
     // ^^Пункты 3 и 4^^
     var minweight = treasures[use[0]]!!.first
     for (i in 1 until use.size) minweight = minOf(minweight, treasures[use[i]]!!.first)
     while (minweight <= capa) { // пока есть хоть один подходящий предмет...
         val x = use.size // (use будет меняться в цикле)
         for (i in 0 until x) {
-            if (use.size >= i && capa >= treasures[use[i]]!!.first) {
-                // если мы не удалили [много] из use и предмет влезает в рюкзак...
-                var weight = treasures[use[i]]!!.first
-                var cost = treasures[use[i]]!!.second
-                for (j in i + 1 until use.size)
-                // если всеми остальными предметами нельзя возместить ныне рассматриваемый...
-                    if (weight - treasures[use[j]]!!.first >= 0) {
-                        weight -= treasures[use[j]]!!.first
-                        cost -= treasures[use[j]]!!.second
-                    } else continue
-                if (cost > 0) {
-                    // ...то мы добавляем его в sum, убираем из use и вычитаем его вес из рюкзака.
-                    sum += use[i]
-                    capa -= treasures[use[i]]!!.first
-                    use.removeAt(i)
+            if (use.size >= i + 1)
+                if (capa >= treasures[use[i]]!!.first) {
+                    // если мы не удалили [много] из use и предмет влезает в рюкзак...
+                    var weight = treasures[use[i]]!!.first
+                    var cost = treasures[use[i]]!!.second
+                    for (j in i + 1 until use.size)
+                    // если всеми остальными предметами нельзя возместить ныне рассматриваемый...
+                        if (weight - treasures[use[j]]!!.first >= 0) {
+                            weight -= treasures[use[j]]!!.first
+                            cost -= treasures[use[j]]!!.second
+                        } else continue
+                    if (cost > 0) {
+                        // ...то мы добавляем его в sum, убираем из use и вычитаем его вес из рюкзака.
+                        sum += use[i]
+                        capa -= treasures[use[i]]!!.first
+                        use.removeAt(i)
+                    }
                 }
-            } else break // если use[i] - уже indexOutOfBounds.
         }
         minweight = treasures[use[0]]!!.first
         for (i in 1 until use.size) minweight = minOf(minweight, treasures[use[i]]!!.first)

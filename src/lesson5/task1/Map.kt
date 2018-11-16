@@ -205,12 +205,13 @@ fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): S
 fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<String>> {
     val used = us(friends)
     val sum = friends.toMutableMap()
-    for ((a, b) in friends)
-        for ((c, d) in sum)
-            if (a in d) sum[c] = sum[c]!!.union(b)
+    for (i in 1..2)
+        for ((a, b) in friends)
+            for ((c, d) in sum)
+                if (a in d) sum[c] = sum[c]!!.union(b)
     for (u in used) {
-        if (sum[u] != null) sum[u] = sum[u]!! - u // почему компилятор требует !! даже после проверки?
-        else sum[u] = setOf()
+        val x = sum[u]
+        sum[u] = if (x != null) x - u else setOf()
     }
     return sum
 }
@@ -360,93 +361,53 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
  *   ) -> emptySet()
  */
 /*
+    1) Ввести критерий ценности предмета - отношение цены к весу.
+    2) Отсортировать мапу по ценности предметов (по убыванию).
+    3) Начать добавлять предметы в sum по специальному алгоритму.
+        3.1) Придумать специальный алгоритм.
+    4) Если разность вместительности рюкзака и общего веса предметов в sum больше веса любого из оставшихся
+  предметов - повторить алгоритм.
+    5) Вернуть sum.
+ */
 fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
-    val wert = mutableMapOf<String, Double>()
-    var inv = capacity
+    // ^^Пункт 1^^
+    val zhi = mutableMapOf<String, Double>()
     val sum = mutableSetOf<String>()
-    for ((s, pair) in treasures) wert[s] = (pair.second + 0.0) / pair.first
-    for (i in wert.size - 1 downTo 0) {
-        if (i > 0 && treasures[wert.toList().sortedBy { (_, v) -> v }[i].first]!!.first <= inv)
-            for (j in i - 1 downTo 0) {
-                var v = 0
-                var weight = 0
-                if (treasures[wert.toList().sortedBy { (_, v) -> v }[j].first]!!.first + weight <=
-                        treasures[wert.toList().sortedBy { (_, v) -> v }[i].first]!!.first) {
-                    weight += treasures[wert.toList().sortedBy { (_, v) -> v }[j].first]!!.first
-                    v += treasures[wert.toList().sortedBy { (_, v) -> v }[j].first]!!.second
+    var capa = capacity
+    for ((str, pie) in treasures) zhi[str] = (pie.second + 0.0) / pie.first
+    // По сути, сама ценность предмета (как численное значение) не требуется - она
+    // будет использоваться только для сортировки => возможно, будет доработка.
+    // ^^Пункт 2^^
+    val use = mutableListOf<String>() // Нужен именно list.
+    for (i in 0 until zhi.size) use[i] = zhi.toList().sortedBy { (_, v) -> v }[i].first // Вот бы ещё сработало...
+    // ^^Пункты 3 и 4^^
+    var minweight = treasures[use[0]]!!.first
+    for (i in 1 until use.size) minweight = minOf(minweight, treasures[use[i]]!!.first)
+    while (minweight <= capa) { // пока есть хоть один подходящий предмет...
+        val x = use.size // (use будет меняться в цикле)
+        for (i in 0 until x) {
+            if (use.size >= i && capa >= treasures[use[i]]!!.first) {
+                // если мы не удалили [много] из use и предмет влезает в рюкзак...
+                var weight = treasures[use[i]]!!.first
+                var cost = treasures[use[i]]!!.second
+                for (j in i + 1 until use.size)
+                // если всеми остальными предметами нельзя возместить ныне рассматриваемый...
+                    if (weight - treasures[use[j]]!!.first >= 0) {
+                        weight -= treasures[use[j]]!!.first
+                        cost -= treasures[use[j]]!!.second
+                    } else continue
+                if (cost > 0) {
+                    // ...то мы добавляем его в sum, убираем из use и вычитаем его вес из рюкзака.
+                    sum += use[i]
+                    capa -= treasures[use[i]]!!.first
+                    use.removeAt(i)
                 }
-                if (j == 0 && v <= treasures[wert.toList().sortedBy { (_, v) -> v }[i].first]!!.second) { // "<=" ???
-                    sum.add(wert.toList().sortedBy { (_, v) -> v }[i].first)
-                    inv -= treasures[wert.toList().sortedBy { (_, v) -> v }[i].first]!!.first
-                }
-            }
-        if (i == 0 && treasures[wert.toList().sortedBy { (_, v) -> v }[i].first]!!.first <= inv)
-            sum.add(wert.toList().sortedBy { (_, v) -> v }[i].first)
-    }
-    return sum.toList().sortedBy { v -> v }.toSet()
-}
-*/
-
-fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
-    val wert = mutableMapOf<String, Double>()
-    var inv = capacity
-    val sum = mutableSetOf<String>()
-    val used = mutableSetOf<String>()
-    for ((a, _) in treasures) used.add(a)
-    for ((s, pair) in treasures) wert[s] = (pair.second + 0.0) / pair.first
-    var check = min(treasures, used, inv)
-    println(check)
-    while (check <= inv) {
-        for (i in wert.size - 1 downTo 0) {
-            if (i > 0 && treasures[wert.toList().sortedBy { (_, v) -> v }[i].first]!!.first <= inv &&
-                    wert.toList().sortedBy { (_, v) -> v }[i].first in used) {
-                var v = 0
-                var weight = 0
-                val sum2 = mutableSetOf<String>()
-                for (j in i - 1 downTo 0)
-                    if (wert.toList().sortedBy { (_, v) -> v }[j].first in used) {
-                        if (treasures[wert.toList().sortedBy { (_, v) -> v }[j].first]!!.first + weight <=
-                                treasures[wert.toList().sortedBy { (_, v) -> v }[i].first]!!.first) {
-                            weight += treasures[wert.toList().sortedBy { (_, v) -> v }[j].first]!!.first
-                            v += treasures[wert.toList().sortedBy { (_, v) -> v }[j].first]!!.second
-                            sum2.add(wert.toList().sortedBy { (_, v) -> v }[j].first)
-                        }
-                        if (j == 0) {
-                            if (v <= treasures[wert.toList().sortedBy { (_, v) -> v }[i].first]!!.second &&
-                                    wert.toList().sortedBy { (_, v) -> v }[i].first in used) {
-                                sum.add(wert.toList().sortedBy { (_, v) -> v }[i].first)
-                                used.remove(wert.toList().sortedBy { (_, v) -> v }[i].first)
-                                inv -= treasures[wert.toList().sortedBy { (_, v) -> v }[i].first]!!.first
-                            } else
-                                if (wert.toList().sortedBy { (_, v) -> v }[i].first in used) {
-                                    sum.addAll(sum2)
-                                    used.removeAll(sum2)
-                                    inv -= weight
-                                } else {
-                                    sum.remove(wert.toList().sortedBy { (_, v) -> v }[i].first)
-                                    sum.addAll(sum2)
-                                    used.removeAll(sum2)
-                                    inv = inv + treasures[wert.toList().sortedBy { (_, v) -> v }[i].first]!!.first - weight
-                                }
-                        }
-                    }
-                sum2.clear()
-            }
-            if (i == 0 && treasures[wert.toList().sortedBy { (_, v) -> v }[i].first]!!.first <= inv &&
-                    wert.toList().sortedBy { (_, v) -> v }[i].first in used) {
-                sum.add(wert.toList().sortedBy { (_, v) -> v }[i].first)
-                used.remove(wert.toList().sortedBy { (_, v) -> v }[i].first)
-                inv -= treasures[wert.toList().sortedBy { (_, v) -> v }[i].first]!!.first
-            }
+            } else break // если use[i] - уже indexOutOfBounds.
         }
-        check = min(treasures, used, inv)
+        minweight = treasures[use[0]]!!.first
+        for (i in 1 until use.size) minweight = minOf(minweight, treasures[use[i]]!!.first)
+        // новый минимальный вес предмета - для while.
     }
-    return sum.toList().sortedBy { v -> v }.toSet()
-}
-
-fun min(a: Map<String, Pair<Int, Int>>, b: MutableSet<String>, c: Int): Int {
-    if (b.isEmpty()) return c + 1
-    var sum = a.toList().first().second.first
-    for (x in b) sum = minOf(a[x]!!.first, sum)
+    // ^^Пункт 5^^
     return sum
 }

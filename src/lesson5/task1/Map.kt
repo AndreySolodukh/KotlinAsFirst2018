@@ -401,9 +401,11 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
                     }
                 }
         }
-        minweight = treasures[use[0]]!!.first
-        for (i in 1 until use.size) minweight = minOf(minweight, treasures[use[i]]!!.first)
-        // новый минимальный вес предмета - для while.
+        if (use.size != 0) {
+            minweight = treasures[use[0]]!!.first
+            for (i in 1 until use.size) minweight = minOf(minweight, treasures[use[i]]!!.first)
+            // новый минимальный вес предмета - для while.
+        } else minweight = capa + 1
     }
     // ^^Пункт 5^^
     return sum

@@ -205,10 +205,13 @@ fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): S
 fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<String>> {
     val used = us(friends)
     val sum = friends.toMutableMap()
-    for (i in 1..2)
+    var presum = mutableMapOf(" " to setOf(""))
+    while (presum != sum) {
+        presum = sum
         for ((a, b) in friends)
             for ((c, d) in sum)
                 if (a in d) sum[c] = sum[c]!!.union(b)
+    }
     for (u in used) {
         val x = sum[u]
         sum[u] = if (x != null) x - u else setOf()
@@ -265,8 +268,7 @@ fun whoAreInBoth(a: List<String>, b: List<String>): List<String> {
  * Например:
  *   canBuildFrom(listOf('a', 'b', 'o'), "baobab") -> true
  */
-fun canBuildFrom(chars: List<Char>, word: String): Boolean =
-        word.toLowerCase().all { it in chars.toString().toLowerCase() }
+fun canBuildFrom(chars: List<Char>, word: String): Boolean = word.toLowerCase().all { it in chars.toString().toLowerCase() }
 
 
 /**

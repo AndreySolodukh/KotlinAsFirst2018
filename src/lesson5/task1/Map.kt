@@ -208,9 +208,12 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
     var presum = mutableMapOf(" " to setOf(""))
     while (presum != sum) {
         presum = sum
-        for ((a, b) in friends)
-            for ((c, d) in sum)
-                if (a in d) sum[c] = sum[c]!!.union(b)
+        for ((c, d) in sum)
+            for ((a, b) in friends)
+                if (a in d) sum[c] = d.union(b)
+        //for ((a, b) in friends)
+        //  for ((c, d) in sum)
+        //    if (a in d) sum[c] = sum[c]!!.union(b)
     }
     for (u in used) {
         val x = sum[u]

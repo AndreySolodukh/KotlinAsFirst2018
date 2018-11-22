@@ -205,14 +205,12 @@ fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): S
 fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<String>> {
     val used = us(friends)
     val sum = friends.toMutableMap()
-    for (el in used) if (sum[el] == null) sum[el] = setOf()
-    var presum = mutableMapOf(" " to setOf(""))
-    while (presum != sum) {
-        presum = sum
-        for (el in used)
-            for (elem in used) if (elem in sum[el]!!) sum[el] = sum[el]!!.union(sum[elem]!!)
+    for (elem in used) {
+        if (elem !in sum) sum[elem] = setOf()
+        for ((str, set) in sum)
+            if (str != elem && elem in sum[str]!!)
+                sum[str] = sum[elem]!! + set - str
     }
-    for (el in used) if (el in sum[el]!!) sum[el] = sum[el]!! - el
     return sum
 }
 // var presum = mutableMapOf(" " to setOf(""))
@@ -386,3 +384,4 @@ fun slv(tres: Map<String, Pair<Int, Int>>, capa: Int): Set<String> {
     for (i in 1..capa) TODO()
     TODO()
 }
+/** ~ Runnin' Out Of Ideas... ~ **/

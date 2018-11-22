@@ -159,7 +159,7 @@ fun flattenPhoneNumber(phone: String): String {
             check--
             continue
         }
-        if (ph[i] !in '0'..'9') return ""
+        if (ph[i] !in '0'..'9' || check % 2 != 0) return ""
     }
     return if (ph.isEmpty()) "" else remover(ph, listOf("(", ")"))
 }

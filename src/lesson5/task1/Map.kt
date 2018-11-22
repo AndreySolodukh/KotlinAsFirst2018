@@ -206,27 +206,31 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
     val used = us(friends)
     val sum = friends.toMutableMap()
     for (el in used) if (sum[el] == null) sum[el] = setOf()
-    for (el in used)
-        for (elem in used) if (elem in sum[el]!!) sum[el] = sum[el]!!.union(sum[elem]!!)
+    var presum = mutableMapOf(" " to setOf(""))
+    while (presum != sum) {
+        presum = sum
+        for (el in used)
+            for (elem in used) if (elem in sum[el]!!) sum[el] = sum[el]!!.union(sum[elem]!!)
+    }
     for (el in used) if (el in sum[el]!!) sum[el] = sum[el]!! - el
     return sum
 }
-    // var presum = mutableMapOf(" " to setOf(""))
-    /*
-    while (presum != sum) {
-        presum = sum
-        for ((c, d) in sum)
-            for ((a, b) in friends)
-                if (a in d) sum[c] = d.union(b)
-        //for ((a, b) in friends)
-        //  for ((c, d) in sum)
-        //    if (a in d) sum[c] = sum[c]!!.union(b)
-    }
-    for (u in used) {
-        val x = sum[u]
-        sum[u] = if (x != null) x - u else setOf()
-    }
-    return sum
+// var presum = mutableMapOf(" " to setOf(""))
+/*
+while (presum != sum) {
+    presum = sum
+    for ((c, d) in sum)
+        for ((a, b) in friends)
+            if (a in d) sum[c] = d.union(b)
+    //for ((a, b) in friends)
+    //  for ((c, d) in sum)
+    //    if (a in d) sum[c] = sum[c]!!.union(b)
+}
+for (u in used) {
+    val x = sum[u]
+    sum[u] = if (x != null) x - u else setOf()
+}
+return sum
 */
 
 
@@ -370,70 +374,15 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
  *     450
  *   ) -> emptySet()
  */
-/*
-    1) Ввести критерий ценности предмета - отношение цены к весу.
-    2) Отсортировать мапу по ценности предметов (по убыванию).
-    3) Начать добавлять предметы в sum по специальному алгоритму.
-        3.1) Придумать специальный алгоритм.
-    4) Если разность вместительности рюкзака и общего веса предметов в sum больше веса любого из оставшихся
-  предметов - повторить алгоритм.
-    5) Вернуть sum.
- */
+
 fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
     val m = mutableMapOf<Int, Pair<Int, Set<String>>>(0 to (0 to setOf()))
     for (i in 1..capacity) m[i] = TODO()
-TODO()
+    TODO()
 }
 
 fun slv(tres: Map<String, Pair<Int, Int>>, capa: Int): Set<String> {
     val m = mutableMapOf<Int, Pair<Int, Set<String>>>(0 to (0 to setOf()))
     for (i in 1..capa) TODO()
-TODO()
+    TODO()
 }
-    /*
-    // ^^Пункт 1^^
-    val zhi = mutableMapOf<String, Double>()
-    val sum = mutableSetOf<String>()
-    var capa = capacity
-    for ((str, pie) in treasures) zhi[str] = (pie.second + 0.0) / pie.first
-    // По сути, сама ценность предмета (как численное значение) не требуется - она
-    // будет использоваться только для сортировки => возможно, будет доработка.
-    // ^^Пункт 2^^
-    val use = mutableListOf<String>() // Нужен именно list.
-    for (i in 0 until zhi.size) use.add(i, zhi.toList().sortedBy { (_, v) -> v }[i].first)
-    // ^^Пункты 3 и 4^^
-    var minweight = treasures[use[0]]!!.first
-    for (i in 1 until use.size) minweight = minOf(minweight, treasures[use[i]]!!.first)
-    while (minweight <= capa) { // пока есть хоть один подходящий предмет...
-        val x = use.size // (use будет меняться в цикле)
-        for (i in 0 until x) {
-            if (use.size >= i + 1)
-                if (capa >= treasures[use[i]]!!.first) {
-                    // если мы не удалили [много] из use и предмет влезает в рюкзак...
-                    var weight = treasures[use[i]]!!.first
-                    var cost = treasures[use[i]]!!.second
-                    for (j in i + 1 until use.size)
-                    // если всеми остальными предметами нельзя возместить ныне рассматриваемый...
-                        if (weight - treasures[use[j]]!!.first >= 0) {
-                            weight -= treasures[use[j]]!!.first
-                            cost -= treasures[use[j]]!!.second
-                        } else continue
-                    if (cost > 0) {
-                        // ...то мы добавляем его в sum, убираем из use и вычитаем его вес из рюкзака.
-                        sum += use[i]
-                        capa -= treasures[use[i]]!!.first
-                        use.removeAt(i)
-                    }
-                }
-        }
-        if (use.size != 0) {
-            minweight = treasures[use[0]]!!.first
-            for (i in 1 until use.size) minweight = minOf(minweight, treasures[use[i]]!!.first)
-            // новый минимальный вес предмета - для while.
-        } else minweight = capa + 1
-    }
-    // ^^Пункт 5^^
-    return sum
-}
-*/
-/**\ ~ Running out of ideas... ~ \**/

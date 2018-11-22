@@ -205,7 +205,14 @@ fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): S
 fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<String>> {
     val used = us(friends)
     val sum = friends.toMutableMap()
-    var presum = mutableMapOf(" " to setOf(""))
+    for (el in used) if (sum[el] == null) sum[el] = setOf()
+    for (el in used)
+        for (elem in used) if (elem in sum[el]!!) sum[el] = sum[el]!!.union(sum[elem]!!)
+    for (el in used) if (el in sum[el]!!) sum[el] = sum[el]!! - el
+    return sum
+}
+    // var presum = mutableMapOf(" " to setOf(""))
+    /*
     while (presum != sum) {
         presum = sum
         for ((c, d) in sum)
@@ -220,7 +227,8 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
         sum[u] = if (x != null) x - u else setOf()
     }
     return sum
-}
+*/
+
 
 fun us(x: Map<String, Set<String>>): MutableSet<String> {
     val u = mutableSetOf<String>()
@@ -271,7 +279,8 @@ fun whoAreInBoth(a: List<String>, b: List<String>): List<String> {
  * Например:
  *   canBuildFrom(listOf('a', 'b', 'o'), "baobab") -> true
  */
-fun canBuildFrom(chars: List<Char>, word: String): Boolean = word.toLowerCase().all { it in chars.toString().toLowerCase() }
+fun canBuildFrom(chars: List<Char>, word: String): Boolean =
+        word.toLowerCase().all { it in chars.map { it.toLowerCase() } }
 
 
 /**
@@ -371,6 +380,17 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
     5) Вернуть sum.
  */
 fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
+    val m = mutableMapOf<Int, Pair<Int, Set<String>>>(0 to (0 to setOf()))
+    for (i in 1..capacity) m[i] = TODO()
+TODO()
+}
+
+fun slv(tres: Map<String, Pair<Int, Int>>, capa: Int): Set<String> {
+    val m = mutableMapOf<Int, Pair<Int, Set<String>>>(0 to (0 to setOf()))
+    for (i in 1..capa) TODO()
+TODO()
+}
+    /*
     // ^^Пункт 1^^
     val zhi = mutableMapOf<String, Double>()
     val sum = mutableSetOf<String>()
@@ -415,4 +435,5 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
     // ^^Пункт 5^^
     return sum
 }
+*/
 /**\ ~ Running out of ideas... ~ \**/

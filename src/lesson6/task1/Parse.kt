@@ -159,9 +159,9 @@ fun flattenPhoneNumber(phone: String): String {
             check--
             continue
         }
-        if (ph[i] !in '0'..'9' || check % 2 != 0) return ""
+        if (ph[i] !in '0'..'9') return ""
     }
-    return if (ph.isEmpty()) "" else remover(ph, listOf("(", ")"))
+    return if (ph.isEmpty() || check % 2 != 0) "" else remover(ph, listOf("(", ")"))
 }
 
 /**

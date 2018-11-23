@@ -306,84 +306,58 @@ fun mostExpensive(description: String): String {
  *
  * Вернуть -1, если roman не является корректным римским числом
  */
+
+/**
+ *M* - удалять по символу и прибавлять по 1000 +++
+ *CM* - удалить и добавить 900                 \
+ *D* - удалить и добавить 500                   \
+ *CD* - удалить и добавить 400                  /
+ *C* - удалять по символу и добавлять по 100   /
+ *XC*  - удалить и добавить 90                \
+ *L* - удалить и добавить 50                   \
+ *XL* - удалить и добавить 40                  /
+ *X* - удалять по символу и добавлять по 10   /
+ *IX* - удалить и добавить 9                 \
+ *V* - удалить и добавить 5                   \
+ *IV* - удалить и добавить 4                  /
+ *I* - удалять по символу и добавлять по 1   /
+ **/
 fun fromRoman(roman: String): Int {
     if (roman.isEmpty()) return -1
+    if (remover(roman, listOf("M", "D", "C", "L", "X", "V", "I")).isNotEmpty()) return -1
+    val nums = mapOf(2 to "MDC", 1 to "CLX", 0 to "XVI")
     var sum = 0
-    var ro = roman
-    val num = mapOf(2 to "MDC", 1 to "CLX", 0 to "XVI")
-    while (ro[0] == 'M') {
-        sum += 1000
-        ro = ro.substring(1, ro.lastIndex)
-    }
-    println(ro[0])
+    var input = roman
+    while (sum < input.length && input[sum] == 'M') sum++
+    if (sum < input.length) input = input.substring(sum, input.length) else return sum * 1000
+    sum *= 1000
+    var c = 0
     for (i in 2 downTo 0) {
-        if (ro.isNotEmpty())
-            while (ro[0] == num[i]!![2] || ro[0] == num[i]!![1]) {
-                /* Я не знаю, что на этом моменте требует от меня программа. Где и как бы я не проверял строку на наличие
-                символов, все вылеты происходят именно в этой строке и именно по причине:
-                "java.lang.StringIndexOutOfBoundsException",
-                хотя нулевой символ в строке есть.
-                 */
-                when {
-                    ro.length == 1 -> {
-                        sum += if (ro[0] == num[i]!![2])
-                            Math.pow(10.0, i + 0.0).toInt()
-                        else 5 * Math.pow(10.0, i + 0.0).toInt()
-                        ro = ""
-                    }
-                    ro[0] == num[i]!![2] && ro[1] == num[i]!![0] && sum % Math.pow(10.0, i + 1.0) == 0.0 -> {
-                        sum += 9 * Math.pow(10.0, i + 0.0).toInt()
-                        ro = ro.substring(2, ro.lastIndex)
-                    }
-                    ro[0] == num[i]!![2] && ro[1] == num[i]!![1] && sum % 1000 == 0 -> {
-                        sum += 4 * Math.pow(10.0, i + 0.0).toInt()
-                        ro = ro.substring(2, ro.lastIndex)
-                    }
-                    ro[0] == num[i]!![1] && sum % 1000 == 0 -> {
-                        sum += 5 * Math.pow(10.0, i + 0.0).toInt()
-                        ro = ro.substring(1, ro.lastIndex)
-                    }
-                    ro[0] == num[i]!![2] -> {
-                        var c = 0
-                        while (ro[0] == num[i]!![2]) {
-                            c++
-                            if (c == 4) return -1
-                            sum += Math.pow(10.0, i + 0.0).toInt()
-                            ro = ro.substring(1, ro.lastIndex)
-                        }
-                    }
-                    else -> return -1
+        val a = nums[i]!!
+        while ((input.length > c) && (input[c] == a[1] || input[c] == a[2])) {
+            when {
+                input.length > c + 1 && input[c] == a[2] && input[c + 1] == a[0] -> {
+                    c += 2
+                    sum += 9 * Math.pow(10.0, i + 0.0).toInt()
                 }
+                input[c] == a[1] -> {
+                    c++
+                    sum += 5 * Math.pow(10.0, i + 0.0).toInt()
+                }
+                input.length > c + 1 && input[c] == a[2] && input[c + 1] == a[1] -> {
+                    c += 2
+                    sum += 4 * Math.pow(10.0, i + 0.0).toInt()
+                }
+                input[c] == a[2] -> {
+                    c++
+                    sum += Math.pow(10.0, i + 0.0).toInt()
+                }
+                else -> return -1
             }
-    }
-    return if (ro.isEmpty()) sum else -1
-    /*
-    *M* - удалять по символу и прибавлять по 1000 +++
-    *CM* - удалить и добавить 900                 \
-    *D* - удалить и добавить 500                   \
-    *CD* - удалить и добавить 400                  /
-    *C* - удалять по символу и добавлять по 100   /
-    *XC*  - удалить и добавить 90                \
-    *L* - удалить и добавить 50                   \
-    *XL* - удалить и добавить 40                  /
-    *X* - удалять по символу и добавлять по 10   /
-    *IX* - удалить и добавить 9                 \
-    *V* - удалить и добавить 5                   \
-    *IV* - удалить и добавить 4                  /
-    *I* - удалять по символу и добавлять по 1   /
 
-    var rom = roman
-    if (roman.isEmpty()) return -1
-    var i = 1
-    var ths = 0
-    while (rom[0] == 'M' && rom.length > 1) {
-        ths++
-        rom = rom.substring(1, rom.length)
+        }
     }
-    while (roman(i) != rom && i < 3001) i++
-    if (i == 3001) i = -1
-    return if (i != -1) ths * 1000 + i else -1
-    */
+    return sum
 }
 
 /**

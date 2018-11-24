@@ -389,6 +389,7 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
 
 fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
     if (treasures.isEmpty()) return setOf()
+    var capa = capacity
     val sum = mutableSetOf<String>()
     val n = treasures.keys.toList()
     val weva = treasures.values.toList() // weva[i].first - вес для n[i], weva[i].second - цена для n[i]
@@ -400,9 +401,23 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
                 m[i to j] = m[i - 1 to j] ?: 0
             else {
                 m[i to j] = maxOf((m[i - 1 to j] ?: 0), (m[i - 1 to j - weva[i - 1].first] ?: 0) + weva[i - 1].second)
-                if ((m[i - 1 to j] ?: 0) < (m[i - 1 to j - weva[i - 1].first] ?: 0) + weva[i - 1].second)
-                    sum.add(n[i - 1])
+
+                //if (capa > weva[i - 1].first &&
+                //        (m[i - 1 to capa] ?: 0) < (m[i - 1 to capa - weva[i - 1].first] ?: 0) + weva[i - 1].second) {
+                //    sum.add(n[i - 1])
+                //    capa -= weva[i - 1].first
+                //}
+
+                //if ((m[i - 1 to j] ?: 0) < (m[i - 1 to j - weva[i - 1].first] ?: 0) + weva[i - 1].second)
+                //    sum.add(n[i - 1])
+                // Так перебор идет по неготовому массиву. Нужно просматривать массив после этого цикла.
             }
+    for (i in n.size downTo 1) // ценность О -> o
+        if (capa >= weva[i - 1].first &&
+                (m[i - 1 to capa] ?: 0) < (m[i - 1 to capa - weva[i - 1].first] ?: 0) + weva[i - 1].second) {
+            sum.add(n[i - 1])
+            capa -= weva[i - 1].first
+        }
     return sum
 }
 

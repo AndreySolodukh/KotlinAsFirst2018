@@ -372,8 +372,91 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
  *     450
  *   ) -> emptySet()
  */
+/*
+1) Ввести критерий ценности предмета - отношение цены к весу.
+2) Отсортировать мапу по ценности предметов (по убыванию).
+3) Начать добавлять предметы в sum по специальному алгоритму.
+3.1) Придумать специальный алгоритм.
+4) Если разность вместительности рюкзака и общего веса предметов в sum больше веса любого из оставшихся
+предметов - повторить алгоритм.
+5) Вернуть sum.
+        Примечание:
+    а) Нет смысла вводить переменные типа minweight - можно просто удалить все неподходящие элементы из
+        wert (ценность предмета)
+    б) Исходя из первого: цикл можно ограничить наличием элементов в wert.
+    в) Не пытаться понять принцип действия метода динамического программирования после 3 часов ночи.
+*/
 
 fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
+    if (treasures.isEmpty()) return setOf()
+    val sum = mutableSetOf<String>()
+    val n = treasures.keys.toList()
+    val weva = treasures.values.toList() // weva[i].first - вес для n[i], weva[i].second - цена для n[i]
+    val m = mutableMapOf<Pair<Int, Int>, Int>()
+    for (i in 1..capacity) m[0 to i] = 0
+    for (i in 1..n.size)
+        for (j in 0..capacity)
+            if (weva[i - 1].first > j)
+                m[i to j] = m[i - 1 to j] ?: 0
+            else {
+                m[i to j] = maxOf((m[i - 1 to j] ?: 0), (m[i - 1 to j - weva[i - 1].first] ?: 0) + weva[i - 1].second)
+                if ((m[i - 1 to j] ?: 0) < (m[i - 1 to j - weva[i - 1].first] ?: 0) + weva[i - 1].second)
+                    sum.add(n[i - 1])
+            }
+    return sum
+}
+
+/** Шаблон для 0-1 ранца: **/
+/*
+capacity - вместительность
+n - количество предметов (treasures.size)
+m - массив ( ( индекс(надеюсь) -> вес ) -> {!!!} )
+w / w[i] - массив с весами предметов
+v / v[i] - массив с ценностями предметов
+{!!!} - пока это только лучшая стоимость. Нужно сделать из этого лучший набор предметов.
+m: mapOf<Pair<Int, Int>, Int>
+for (j in 0..capacity) m[0, j] = 0
+for (i in 1..n)
+    for (j in 0..capacity)
+        if (w[i] > j) m[i, j] = m[i-1, j]
+            else m[i, j] = max( m[i-1, j], m[i-1, j-w[i]] + v[i])
+ */
+
+/*
+if (treasures.isEmpty()) return setOf()
+val w = treasures.map { it.value.first to it.key }
+val v = treasures.map { it.value.second to it.key }
+val m = mutableMapOf<Pair<Int, Int>, Pair<Int, Set<String>>>() // Set потом станет списком предметов. Наверное.
+for (j in 0..capacity) m[-1 to j] = 0 to setOf()
+for (i in 0 until treasures.size) // Или w.size. Или treasures.size. Отличаться они не должны.
+    for (j in 0..capacity)
+        if (w[i].first > j)
+            m[i to j] = m[i - 1 to j]!!.first to setOf(v[i].second)
+            // Старый Список + Новый Список. Не знаю, почему.
+        else {
+            if (m[i - 1 to j]!!.first > m[i - 1 to j - w[i].first]!!.first + v[i].first)
+                m[i to j] = m[i - 1 to j]!!.first to m[i - 1 to j]!!.second
+            else m[i to j] = (m[i - 1 to j - w[i].first]!!.first + v[i].first) to
+                    (m[i - 1 to j - w[i].first]!!.second + v[i].second)
+
+        }
+return m[w.size - 1 to capacity]!!.second
+*/
+
+/*
+val wert = mutableMapOf<String, Double>()
+for ((str, pie) in treasures) wert[str] = (pie.second + 0.0) / pie.first
+var capa = capacity
+val sum = mutableSetOf<String>()
+while (wert.isNotEmpty()) {
+    for ((elem, _) in wert)
+        if (treasures[elem]!!.second > capa) wert.remove(elem)
+
+}
+}
+*/
+/*
+{
     val m = mutableMapOf<Int, Pair<Int, Set<String>>>(0 to (0 to setOf()))
     for (i in 1..capacity) m[i] = TODO()
     TODO()
@@ -384,4 +467,54 @@ fun slv(tres: Map<String, Pair<Int, Int>>, capa: Int): Set<String> {
     for (i in 1..capa) TODO()
     TODO()
 }
-/** ~ Runnin' Out Of Ideas... ~ **/
+*/
+
+/*
+// ^^Пункт 1^^
+val zhi = mutableMapOf<String, Double>()
+val sum = mutableSetOf<String>()
+var capa = capacity
+for ((str, pie) in treasures) zhi[str] = (pie.second + 0.0) / pie.first
+// По сути, сама ценность предмета (как численное значение) не требуется - она
+// будет использоваться только для сортировки => возможно, будет доработка.
+// ^^Пункт 2^^
+val use = mutableListOf<String>() // Нужен именно list.
+for (i in 0 until zhi.size) use.add(i, zhi.toList().sortedBy { (_, v) -> v }[i].first)
+// ^^Пункты 3 и 4^^
+var minweight = treasures[use[0]]!!.first
+for (i in 1 until use.size) minweight = minOf(minweight, treasures[use[i]]!!.first)
+while (minweight <= capa) { // пока есть хоть один подходящий предмет...
+    val x = use.size // (use будет меняться в цикле)
+    for (i in 0 until x) {
+        if (use.size >= i + 1)
+            if (capa >= treasures[use[i]]!!.first) {
+                // если мы не удалили [много] из use и предмет влезает в рюкзак...
+                var weight = treasures[use[i]]!!.first
+                var cost = treasures[use[i]]!!.second
+                for (j in i + 1 until use.size)
+                // если всеми остальными предметами нельзя возместить ныне рассматриваемый...
+                    if (weight - treasures[use[j]]!!.first >= 0) {
+                        weight -= treasures[use[j]]!!.first
+                        cost -= treasures[use[j]]!!.second
+                    } else continue
+                if (cost > 0) {
+                    // ...то мы добавляем его в sum, убираем из use и вычитаем его вес из рюкзака.
+                    sum += use[i]
+                    capa -= treasures[use[i]]!!.first
+                    use.removeAt(i)
+                }
+            }
+    }
+    if (use.size != 0) {
+        minweight = treasures[use[0]]!!.first
+        for (i in 1 until use.size) minweight = minOf(minweight, treasures[use[i]]!!.first)
+        // новый минимальный вес предмета - для while.
+    } else minweight = capa + 1
+}
+// ^^Пункт 5^^
+return sum
+}
+*/
+
+/**\ ~ Running out of ideas... ~ \**/
+

@@ -420,7 +420,7 @@ fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
     for (i in 0 until cells) sum.add(i, 0)
     while (check < limit && index < commands.length) {
         check++
-        if (kotlin.math.abs(num) >= sum.size) throw IllegalStateException()
+        if (num >= sum.size || num < 0) throw IllegalStateException()
         when (commands[index]) {
             '<' -> num--
             '>' -> num++
@@ -431,7 +431,6 @@ fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
                 if (j >= cycles.size - 1) cycles.add(cycles.size, 0)
                 j++
                 cycles[j] = index
-                println(cycles[j])
             } else {
                 var chk = 1
                 while (chk != 0) {

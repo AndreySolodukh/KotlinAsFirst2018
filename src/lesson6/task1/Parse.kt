@@ -396,52 +396,57 @@ fun fromRoman(roman: String): Int {
  * IllegalArgumentException должен бросаться даже если ошибочная команда не была достигнута в ходе выполнения.
  *
  */
-fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> = TODO()
-/*    if (remover(commands, listOf("[", "]", ">", "<", "+", "-", " ")).isNotEmpty())
+fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
+    if (remover(commands, listOf("[", "]", ">", "<", "+", "-", " ")).isNotEmpty())
         throw IllegalArgumentException()
     var num = cells / 2
     var check = 0
-    var str = commands
-    for (elem in commands.toList()) {
-        if (elem == '[') num++
-        if (elem == ']') num--
+    var index = 0
+    val cycles = mutableListOf<Int>()
+    var j = -1
+    for (i in 0 until commands.length) {
+        if (commands[i] == '[') {
+            num++
+            check = 1
+
+        }
+        if (commands[i] == ']') {
+            num--
+            check = 0
+        }
     }
-    if (num != cells / 2) throw IllegalArgumentException()
+    if (num != cells / 2 || check != 0) throw IllegalArgumentException()
     val sum = mutableListOf<Int>()
     for (i in 0 until cells) sum.add(i, 0)
-    while (check < limit && str.isNotEmpty()) {
+    while (check < limit && index < commands.length) {
         check++
-        when (str[0]) {
+        if (kotlin.math.abs(num) >= sum.size) throw IllegalStateException()
+        when (commands[index]) {
             '<' -> num--
             '>' -> num++
             '+' -> sum[num]++
             '-' -> sum[num]--
-            ' ' -> num = num
+            ' ' -> if (2 + 2 == 5) println("KILL ALL HUMANZ")
+            '[' -> if (sum[num] != 0) {
+                if (j >= cycles.size - 1) cycles.add(cycles.size, 0)
+                j++
+                cycles[j] = index
+                println(cycles[j])
+            } else {
+                var chk = 1
+                while (chk != 0) {
+                    index++
+                    if (commands[index] == '[') chk++
+                    if (commands[index] == ']') chk--
+                }
+            }
             else -> {
-                list = solver()
-
+                if (sum[num] != 0) {
+                    index = cycles[j]
+                } else j--
             }
         }
-        str = if (str.length != 1) str.substring(1, str.length) else ""
+        index++
     }
     return sum
 }
-
-fun solver(n: Int, s: List<Int>, d: String): List<Int> {
-    var str = d
-    var num = n
-    var sum = s
-    var i = 0
-    when (str[i]) {
-        '<' -> num--
-        '>' -> num++
-        '+' -> sum[num]++
-        '-' -> sum[num]--
-        ' ' -> num = num
-        '[' -> {
-
-        }
-        else -> if (num == 0) i = 0 else
-    }
-}
-    */

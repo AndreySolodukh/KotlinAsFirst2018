@@ -420,7 +420,6 @@ fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
     for (i in 0 until cells) sum.add(i, 0)
     while (check < limit && index < commands.length) {
         check++
-        if (num >= sum.size || num < 0) throw IllegalStateException()
         when (commands[index]) {
             '<' -> num--
             '>' -> num++
@@ -446,6 +445,7 @@ fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
             }
         }
         index++
+        if (num >= sum.size || num < 0) throw IllegalStateException()
     }
     return sum
 }

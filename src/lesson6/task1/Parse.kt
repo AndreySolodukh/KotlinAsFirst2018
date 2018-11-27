@@ -278,7 +278,7 @@ fun firstDuplicateIndex(str: String): Int {
  */
 fun mostExpensive(description: String): String {
     val parts = description.split("; ")
-    var slv: Double = -0.1
+    var slv = 0.0
     var sum = ""
     try {
         for (p in parts) {
@@ -414,8 +414,9 @@ fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
             num--
             check = 0
         }
+        if (num < cells / 2) throw IllegalArgumentException()
     }
-    if (num != cells / 2 || check != 0) throw IllegalArgumentException()
+    if (num != cells / 2 || check == 1) throw IllegalArgumentException()
     val sum = mutableListOf<Int>()
     for (i in 0 until cells) sum.add(i, 0)
     while (check < limit && index < commands.length) {

@@ -281,7 +281,7 @@ fun mostExpensive(description: String): String {
         for (p in parts) {
             val str = p.split(" ")
             if (str.size != 2) return ""
-            if (str[1].toDouble() > slv) {
+            if (str[1].toDouble() >= slv) {
                 slv = str[1].toDouble()
                 sum = str[0]
             }

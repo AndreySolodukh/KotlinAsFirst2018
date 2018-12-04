@@ -7,10 +7,9 @@ import lesson2.task2.daysInMonth
 import java.util.*
 import kotlin.NoSuchElementException
 
-fun remover(str: String, list: List<String>): String {
-    var sum = str
-    for (elem in list) sum = sum.replace(elem, "")
-    return sum
+fun remover(str: String, list: List<Char>): String = buildString {
+    for (elem in str)
+        if (elem !in list) append(elem)
 }
 
 /**
@@ -147,7 +146,7 @@ fun dateDigitToStr(digital: String): String {
  * При неверном формате вернуть пустую строку
  */
 fun flattenPhoneNumber(phone: String): String {
-    val ph = remover(phone, listOf(" ", "-"))
+    val ph = remover(phone, listOf(' ', '-'))
     var check = 2
     for (i in 0 until ph.length) {
         if (i == 0 && ph[i] == '+') continue
@@ -161,7 +160,7 @@ fun flattenPhoneNumber(phone: String): String {
         }
         if (ph[i] !in '0'..'9') return ""
     }
-    return if (ph.isEmpty() || check % 2 != 0) "" else remover(ph, listOf("(", ")"))
+    return if (ph.isEmpty() || check % 2 != 0) "" else remover(ph, listOf('(', ')'))
 }
 
 /**
@@ -176,7 +175,6 @@ fun flattenPhoneNumber(phone: String): String {
  */
 fun bestLongJump(jumps: String): Int {
     val parts = jumps.split(" ")
-    println(parts)
     var sum = -1
     try {
         for (p in parts)
@@ -199,14 +197,13 @@ fun bestLongJump(jumps: String): Int {
  * При нарушении формата входной строки вернуть -1.
  */
 fun bestHighJump(jumps: String): Int {
+    if (remover(jumps, listOf(' ', '%', '-', '+')).any { it !in '0'..'9' }) return -1
     val parts = jumps.split(" ")
     var sum = -1
     try {
         for (i in 1 until parts.size step 2) {
             if ("+" in parts[i] && sum < parts[i - 1].toInt()) sum = parts[i - 1].toInt()
         }
-        val s = jumps.replace(" ", "").replace("%", "").replace("+", "").replace("-", "")
-        if (s.any { it !in '0'..'9' }) return -1
     } catch (e: NumberFormatException) {
         return -1
     }
@@ -324,7 +321,7 @@ fun mostExpensive(description: String): String {
  **/
 fun fromRoman(roman: String): Int {
     if (roman.isEmpty()) return -1
-    if (remover(roman, listOf("M", "D", "C", "L", "X", "V", "I")).isNotEmpty()) return -1
+    if (remover(roman, listOf('M', 'D', 'C', 'L', 'X', 'V', 'I')).isNotEmpty()) return -1
     val nums = mapOf(2 to "MDC", 1 to "CLX", 0 to "XVI")
     var sum = 0
     var input = roman
@@ -397,7 +394,7 @@ fun fromRoman(roman: String): Int {
  *
  */
 fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
-    if (remover(commands, listOf("[", "]", ">", "<", "+", "-", " ")).isNotEmpty())
+    if (remover(commands, listOf('[', ']', '>', '<', '+', '-', ' ')).isNotEmpty())
         throw IllegalArgumentException()
     var num = cells / 2
     var check = 0

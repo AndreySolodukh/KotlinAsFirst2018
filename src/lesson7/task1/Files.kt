@@ -4,6 +4,11 @@ package lesson7.task1
 
 import java.io.File
 
+fun letter(input: String): String = buildString {
+    for (elem in input)
+        if (elem.isLetter()) append(elem) else append(" ")
+}
+
 /**
  * Пример
  *
@@ -55,9 +60,21 @@ fun alignFile(inputName: String, lineLength: Int, outputName: String) {
  */
 fun countSubstrings(inputName: String, substrings: List<String>): Map<String, Int> {
     val sum = mutableMapOf<String, Int>()
-    for (l in File(inputName).readLines())
-        for (s in substrings)
-            sum[s] = (sum[s] ?: 0) + (l.length - l.toLowerCase().replace(s.toLowerCase(), "").length) / s.length
+    var slv = ""
+    for (s in substrings) {
+        var res = 0
+        for (l in File(inputName).readLines()) {
+            var str = (slv + l).toLowerCase()
+            while (s.toLowerCase() in str) {
+                res++
+                val x = str.indexOf(s.toLowerCase())
+                str = str.removeRange(x, x + 1)
+            }
+            slv = if (l.length > s.length) l.substring(l.length - s.length, l.length - 1) else l
+        }
+        sum[s] = res
+        slv = ""
+    }
     return sum
 }
 
@@ -77,24 +94,19 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
  */
 fun sibilants(inputName: String, outputName: String) {
     File(outputName).bufferedWriter().use {
-        val replace = mapOf('ы' to 'и', 'Ы' to 'И', 'Я' to 'А', 'я' to 'а', 'ю' to 'у', 'Ю' to 'У')
+        val rep = mapOf('ы' to 'и', 'Ы' to 'И', 'Я' to 'А', 'я' to 'а', 'ю' to 'у', 'Ю' to 'У')
         for (line in File(inputName).readLines()) {
-            var text = ""
-            var length = 0
-            for (i in 0 until line.length)
-                if (line[i].toLowerCase() in setOf('ж', 'ч', 'ш', 'щ') && line[i + 1] in replace.keys) {
-                    text += line.substring(length, i + 2)
-                            .replace("${line[i]}${line[i + 1]}", "${line[i]}${replace[line[i + 1]]}")
-                    length = text.length
+            var pre = '%' // Особого смысла в выборе символа нет - он просто должен отличаться от ж, ч, щ, ш
+            val slv = buildString {
+                for (char in line) {
+                    if (pre.toLowerCase() in "жчшщ" && char in rep.keys) append(rep[char])
+                    else append(char)
+                    pre = char
                 }
-            if (length == 0) {
-                it.write(line)
-                it.newLine()
-                continue
             }
-            if (length < line.length) text += line.substring(text.length, line.length)
-            it.write(text)
+            it.write(slv)
             it.newLine()
+            pre = '%'
         }
     }
 }
@@ -118,10 +130,10 @@ fun sibilants(inputName: String, outputName: String) {
  */
 fun centerFile(inputName: String, outputName: String) {
     File(outputName).bufferedWriter().use {
-        var maxlength = 0
-        for (line in File(inputName).readLines()) if (line.trim().length > maxlength) maxlength = line.trim().length
+        var max = 0
+        for (line in File(inputName).readLines()) max = maxOf(max, line.trim().length)
         for (line in File(inputName).readLines()) {
-            for (i in 1..(maxlength - line.trim().length) / 2) it.write(" ")
+            for (i in 1..(max - line.trim().length) / 2) it.write(" ")
             it.write(line.trim())
             it.newLine()
         }
@@ -156,7 +168,35 @@ fun centerFile(inputName: String, outputName: String) {
  * 8) Если входной файл удовлетворяет требованиям 1-7, то он должен быть в точности идентичен выходному файлу
  */
 fun alignFileByWidth(inputName: String, outputName: String) {
-    TODO()
+    File(outputName).bufferedWriter().use {
+        var max = 0
+        for (line in File(inputName).readLines()) max = maxOf(max, line.trim().length)
+        for (line in File(inputName).readLines()) {
+            if (line.replace(" ", "").isEmpty()) {
+                it.newLine()
+                continue
+            }
+            val words = line.trim().split(' ')
+            if (words.size == 1) {
+                it.write(words[0])
+                it.newLine()
+                continue
+            }
+            var amount = 0
+            for (word in words) amount += word.length
+            var odd = (max - amount) % (words.size - 1)
+            for (i in 0..words.size - 2) {
+                it.write(words[i])
+                for (j in 1..(max - amount) / (words.size - 1)) it.write(" ")
+                if (odd > 0) {
+                    it.write(" ")
+                    odd--
+                }
+            }
+            it.write(words.last())
+            it.newLine()
+        }
+    }
 }
 
 /**
@@ -177,7 +217,23 @@ fun alignFileByWidth(inputName: String, outputName: String) {
  * Ключи в ассоциативном массиве должны быть в нижнем регистре.
  *
  */
-fun top20Words(inputName: String): Map<String, Int> = TODO()
+fun top20Words(inputName: String): Map<String, Int> {
+    val sum = mutableMapOf<String, Int>()
+    for (line in File(inputName).readLines()) {
+        val words = letter(line).toLowerCase().split(" ")
+        for (word in words.filter { it.isNotEmpty() }) sum[word] = (sum[word] ?: 0) + 1
+    }
+    var count = if (sum.size < 20) sum.size else 20
+    val fin = sum.toList().sortedBy { (_, v) -> v }.reversed().toMap()
+    sum.clear()
+    for ((k, v) in fin) {
+        if (count > 0) {
+            sum[k] = v
+            count--
+        } else break
+    }
+    return sum
+}
 
 /**
  * Средняя
@@ -215,7 +271,20 @@ fun top20Words(inputName: String): Map<String, Int> = TODO()
  * Обратите внимание: данная функция не имеет возвращаемого значения
  */
 fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: String) {
-    TODO()
+    File(outputName).bufferedWriter().use {
+        for (char in File(inputName).readText()) {
+            when {
+                (char.toLowerCase() in dictionary.keys.map { it.toLowerCase() }) -> {
+                    if (char.isUpperCase()) {
+                        val str = dictionary[char.toLowerCase()] ?: dictionary[char.toUpperCase()]
+                        it.write(str!![0].toUpperCase().toString())
+                        it.write(str.substring(0, str.length - 1).toLowerCase())
+                    } else it.write((dictionary[char.toLowerCase()] ?: dictionary[char.toUpperCase()])!!.toLowerCase())
+                }
+                else -> it.write(char.toString())
+            }
+        }
+    }
 }
 
 /**
@@ -290,7 +359,92 @@ Suspendisse <s>et elit in enim tempus iaculis</s>.
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
-    TODO()
+    File(outputName).bufferedWriter().use {
+        it.write("<html>")
+        it.write("<body>")
+        it.write("<p>")
+        var icheck = 0
+        var bcheck = 0
+        var scheck = 0
+        var pre = '7'
+        for (line in File(inputName).readLines()) {
+            if (line.isEmpty() && pre != '7') {
+                it.write("</p>")
+                it.write("<p>")
+            }
+            for (i in 0 until line.length)
+                when {
+                    pre == '~' && line[i] == '~' ->
+                        if (scheck == 0) {
+                            it.write("<s>")
+                            pre = '1'
+                            scheck = 1
+                        } else {
+                            it.write("</s>")
+                            pre = '1'
+                            scheck = 0
+                        }
+                    pre == '~' -> {
+                        it.write("~${line[i]}")
+                        pre = line[i]
+                    }
+                    pre == '*' && line[i] == '*' -> {
+                        if (bcheck == 0) {
+                            it.write("<b>")
+                            pre = '1'
+                            bcheck = 1
+                        } else {
+                            it.write("</b>")
+                            pre = '1'
+                            bcheck = 0
+                        }
+                    }
+                    pre == '*' -> {
+                        if (line[i] !in "*~") {
+                            if (icheck == 0) {
+                                it.write("<i>${line[i]}")
+                                pre = line[i]
+                                icheck = 1
+                            } else {
+                                it.write("</i>${line[i]}")
+                                pre = line[i]
+                                icheck = 0
+                            }
+                        } else {
+                            if (icheck == 0) {
+                                it.write("<i>")
+                                pre = line[i]
+                                icheck = 1
+                            } else {
+                                it.write("</i>")
+                                pre = line[i]
+                                icheck = 0
+                            }
+                        }
+                    }
+                    i == line.length - 1 && line[i] == '*' -> {
+                        icheck = if (icheck == 0) {
+                            it.write("<i>")
+                            1
+                        } else {
+                            it.write("</i>")
+                            0
+                        }
+                    }
+                    i == line.length - 1 && line[i] == '~' -> it.write("~")
+                    line[i] in "*~" -> pre = line[i]
+                    else -> {
+                        it.write(line[i].toString())
+                        pre = line[i]
+                    }
+
+                }
+        }
+        it.write("</p>")
+        it.write("</body>")
+        it.write("</html>")
+
+    }
 }
 
 /**
@@ -418,17 +572,38 @@ fun markdownToHtml(inputName: String, outputName: String) {
 2212785
  * Используемые пробелы, отступы и дефисы должны в точности соответствовать примеру.
  * Нули в множителе обрабатывать так же, как и остальные цифры:
-235
+   235
  *  10
------
-0
+ -----
+     0
 +235
------
-2350
+ -----
+ 2350
  *
  */
 fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
-    TODO()
+    File(outputName).bufferedWriter().use {
+        val sum = "${lhv * rhv}"
+        for (i in 0..sum.length - "$lhv".length) it.write(" ")
+        it.write("$lhv")
+        it.newLine()
+        it.write("*")
+        for (i in 1..sum.length - "$rhv".length) it.write(" ")
+        it.write("$rhv")
+        it.newLine()
+        for (i in 0..sum.length) it.write("-")
+        it.newLine()
+        for (i in 0 until "$rhv".length) {
+            val slv = (lhv * ((rhv / Math.pow(10.0, i + 0.0).toInt()) % 10)).toString()
+            if (i != 0) it.write("+") else it.write(" ")
+            for (j in 1..sum.length - slv.length - i) it.write(" ")
+            it.write(slv)
+            it.newLine()
+        }
+        for (i in 0..sum.length) it.write("-")
+        it.newLine()
+        it.write(" $sum")
+    }
 }
 
 
@@ -453,6 +628,33 @@ fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
  *
  */
 fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
-    TODO()
+    File(outputName).bufferedWriter().use {
+        it.write(" $lhv | $rhv")
+        it.newLine()
+        val sum = lhv / rhv
+        println(sum)
+        val s = sum.toString()[0]
+
+        println(s) // Вот это печатает цифру 9
+        println(s.toInt()) // А вот ЭТО уже 57
+        /** Что-то сломалось **/
+        println(sum / Math.pow(10.0, "$sum".length - 1.0).toInt()) // И опять 9
+
+        it.write("-${"$sum"[0].toInt() * rhv}")
+        for (i in 1..("$lhv".length + 3 - "-${"$sum"[0].toInt() * rhv}".length)) it.write(" ")
+        it.write("$sum")
+        it.newLine()
+        for (i in 1 until sum.toString().length) {
+            val slv = sum.toString()[i].toInt() * rhv
+            for (j in 1..i) it.write(" ")
+            it.write("-$slv")
+            it.newLine()
+            for (j in 1..i) it.write(" ")
+            for (j in 1.."-$slv".length) it.write("_")
+            it.newLine()
+
+
+        }
+    }
 }
 

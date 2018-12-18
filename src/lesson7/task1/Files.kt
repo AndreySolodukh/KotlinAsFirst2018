@@ -170,11 +170,11 @@ fun alignFileByWidth(inputName: String, outputName: String) {
         var max = 0
         for (line in File(inputName).readLines()) max = maxOf(max, line.trim().length)
         for (line in File(inputName).readLines()) {
-            if (line.replace(" ", "").isEmpty()) {
+            val words = line.trim().split(' ').filter { it.isNotEmpty() }
+            if (words.isEmpty()) {
                 it.newLine()
                 continue
             }
-            val words = line.trim().split(' ')
             if (words.size == 1) {
                 it.write(words[0])
                 it.newLine()

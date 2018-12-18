@@ -60,20 +60,18 @@ fun alignFile(inputName: String, lineLength: Int, outputName: String) {
  */
 fun countSubstrings(inputName: String, substrings: List<String>): Map<String, Int> {
     val sum = mutableMapOf<String, Int>()
-    var slv = ""
     for (s in substrings) {
-        var res = 0
-        for (l in File(inputName).readLines()) {
-            var str = (slv + l).toLowerCase()
-            while (s.toLowerCase() in str) {
-                res++
-                val x = str.indexOf(s.toLowerCase())
-                str = str.removeRange(x, x + 1)
+        var count = 0
+        val str = buildString {
+            for (c in File(inputName).readText()) {
+                this.append(c.toLowerCase())
+                if (s.toLowerCase() in this) {
+                    count++
+                    this.delete(0, this.length + 1 - s.length)
+                }
             }
-            slv = if (l.length > s.length) l.substring(l.length - s.length, l.length - 1) else l
         }
-        sum[s] = res
-        slv = ""
+        sum[s] = count
     }
     return sum
 }
@@ -270,7 +268,7 @@ fun top20Words(inputName: String): Map<String, Int> {
  *
  * Обратите внимание: данная функция не имеет возвращаемого значения
  */
-fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: String) {
+fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: String) { // -----------------------------------
     File(outputName).bufferedWriter().use {
         for (char in File(inputName).readText()) {
             when {
@@ -358,7 +356,7 @@ Suspendisse <s>et elit in enim tempus iaculis</s>.
  *
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
-fun markdownToHtmlSimple(inputName: String, outputName: String) {
+fun markdownToHtmlSimple(inputName: String, outputName: String) {  // ----------------------------------------------------------------
     File(outputName).bufferedWriter().use {
         it.write("<html>")
         it.write("<body>")
@@ -627,7 +625,7 @@ fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
  * Используемые пробелы, отступы и дефисы должны в точности соответствовать примеру.
  *
  */
-fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
+fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) { // -----------------------------------------------------------
     File(outputName).bufferedWriter().use {
         it.write(" $lhv | $rhv")
         it.newLine()

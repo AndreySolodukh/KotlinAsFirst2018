@@ -221,16 +221,7 @@ fun top20Words(inputName: String): Map<String, Int> {
         val words = letter(line).toLowerCase().split(" ")
         for (word in words.filter { it.isNotEmpty() }) sum[word] = (sum[word] ?: 0) + 1
     }
-    var count = if (sum.size < 20) sum.size else 20
-    val fin = sum.toList().sortedBy { (_, v) -> v }.reversed().toMap()
-    sum.clear()
-    for ((k, v) in fin) {
-        if (count > 0) {
-            sum[k] = v
-            count--
-        } else break
-    }
-    return sum
+    return sum.toList().sortedBy { (_, v) -> v }.reversed().take(20).toMap()
 }
 
 /**
@@ -276,7 +267,7 @@ fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: 
                     if (char.isUpperCase()) {
                         val str = dictionary[char.toLowerCase()] ?: dictionary[char.toUpperCase()]
                         it.write(str!![0].toUpperCase().toString())
-                        it.write(str.substring(0, str.length - 1).toLowerCase())
+                        it.write(str.substring(1, str.length).toLowerCase())
                     } else it.write((dictionary[char.toLowerCase()] ?: dictionary[char.toUpperCase()])!!.toLowerCase())
                 }
                 else -> it.write(char.toString())
@@ -570,13 +561,13 @@ fun markdownToHtml(inputName: String, outputName: String) {
 2212785
  * Используемые пробелы, отступы и дефисы должны в точности соответствовать примеру.
  * Нули в множителе обрабатывать так же, как и остальные цифры:
-   235
+235
  *  10
- -----
-     0
+-----
+0
 +235
- -----
- 2350
+-----
+2350
  *
  */
 fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {

@@ -263,14 +263,11 @@ fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: 
     File(outputName).bufferedWriter().use {
         for (char in File(inputName).readText()) {
             when {
-                (char.toLowerCase() in dictionary.keys.map { it.toLowerCase() }) -> {
-                    if (char.isUpperCase()) {
-                        val str = dictionary[char.toLowerCase()] ?: dictionary[char.toUpperCase()]
-                        it.write(str!![0].toUpperCase().toString())
-                        it.write(str.substring(1, str.length).toLowerCase())
-                    } else it.write((dictionary[char.toLowerCase()] ?: dictionary[char.toUpperCase()])!!.toLowerCase())
-                }
-                else -> it.write(char.toString())
+                (char.toLowerCase() in dictionary.keys.map { it.toLowerCase() }) ->
+                    if (char.isUpperCase())
+                        it.write((dictionary[char] ?: dictionary[char.toLowerCase()])!!.toLowerCase().capitalize())
+                    else it.write((dictionary[char] ?: dictionary[char.toUpperCase()])!!.toLowerCase())
+                else -> it.append(char) // Чем вообще write отличается от append?
             }
         }
     }
